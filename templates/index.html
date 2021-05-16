@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Linear Regression Visualization</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
+</head>
+<body>
+<h1>Linear Regression!</h1>
+<div id="lin-reg-graph" onclick="addPoint()">
+    {{ graph | safe }}
+</div>
+
+<button onclick="gradDesc(1)">1 iteration of Gradient Descent!</button>
+<button onclick="gradDesc(5)">5 iterations of Gradient Descent!</button>
+<button onclick="gradDesc(10)">10 iterations of Gradient Descent!</button>
+<button onclick="gradDesc(100_000_000)">Gradient Descent until convergence!</button>
+<button onclick="location.reload()">Clear</button>
+<br>
+<p>Degree of line: </p>
+<input type="number" id="num_of_degrees" value="1" min="1">
+
+<p id="converged">Run gradient descent until convergence</p>
+<p id="cost">Cost: <span></span></p>
+<p id="intercept">Intercept: <span></span></p>
+<p id="slope">Slope: <span></span></p>
+</body>
+</html>
+<style>
+    * {
+        font-family: 'Roboto', sans-serif;
+    }
+</style>
+<script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
+
+<script>
+    function addPoint() {
+        const point = $(".mpld3-coordinates").text();
+        let coordinates = point.matchAll("-?\\d+\\.?\\d+");
+        coordinates = Array.from(coordinates)
+        const x = parseFloat(coordinates[0][0]);
+        const y = parseFloat(coordinates[1][0]);
+
+        $.ajax({
+            type: "POST",
+            url: "add_point",
+            data: JSON.stringify({"x": x, "y": y}),
+            contentType: "application/json"
+        }).done(function (data) {
+            $("#lin-reg-graph").html(data)
+        }).fail(function (data) {
+            alert("POST failed");
+        });
+    }
+
+    function gradDesc(num_of_iterations) {
+        const numOfDegrees = $("#num_of_degrees").val();
+        $.ajax({
+            type: "POST",
+            url: "grad_desc",
+            data: JSON.stringify({"num_of_iterations": num_of_iterations,
+                                  "degree": numOfDegrees}),
+            contentType: "application/json"
+        }).done(function (data) {
+            $("#lin-reg-graph").html(data['graph'])
+            if (data['converged']) {
+                console.log(data['converged'])
+                $("#converged").text("Line has converged!")
+            } else {
+                $("#converged").text("Line has not converged!")
+            }
+            $("#cost span").text(data['cost'])
+            $("#intercept span").text(data['intercept'])
+            $("#slope span").text(data['slope'])
+        }).fail(function (data) {
+            alert("POST failed");
+        });
+    }
+</script>
