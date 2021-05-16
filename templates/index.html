@@ -15,6 +15,7 @@
 <button onclick="gradDesc(1)">1 iteration of Gradient Descent!</button>
 <button onclick="gradDesc(5)">5 iterations of Gradient Descent!</button>
 <button onclick="gradDesc(10)">10 iterations of Gradient Descent!</button>
+<button onclick="gradDesc(100)">100 iterations of Gradient Descent!</button>
 <button onclick="gradDesc(100_000_000)">Gradient Descent until convergence!</button>
 <button onclick="location.reload()">Clear</button>
 <br>
@@ -22,9 +23,9 @@
 <input type="number" id="num_of_degrees" value="1" min="1">
 
 <p id="converged">Run gradient descent until convergence</p>
-<p id="cost">Cost: <span></span></p>
-<p id="intercept">Intercept: <span></span></p>
-<p id="slope">Slope: <span></span></p>
+<p id="cost">Cost: <span>0</span></p>
+<p id="intercept">Intercept: <span>0</span></p>
+<p id="slope">Slope: <span>0</span></p>
 </body>
 </html>
 <style>
@@ -59,6 +60,7 @@
 
     function gradDesc(num_of_iterations) {
         const numOfDegrees = $("#num_of_degrees").val();
+        console.log($("#num_of_degrees").val())
         $.ajax({
             type: "POST",
             url: "grad_desc",
@@ -67,12 +69,7 @@
             contentType: "application/json"
         }).done(function (data) {
             $("#lin-reg-graph").html(data['graph'])
-            if (data['converged']) {
-                console.log(data['converged'])
-                $("#converged").text("Line has converged!")
-            } else {
-                $("#converged").text("Line has not converged!")
-            }
+            $("#converged").text(data['converged'])
             $("#cost span").text(data['cost'])
             $("#intercept span").text(data['intercept'])
             $("#slope span").text(data['slope'])
