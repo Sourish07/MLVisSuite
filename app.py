@@ -36,7 +36,7 @@ def main():
     mpld3.plugins.clear(fig)
     plugins.connect(fig, plugins.MousePosition(fontsize=0))
     plugins.connect(fig, MoveAxis())
-    return render_template("index.html", graph=fig_to_html(fig))
+    return render_template("index.html", graph=get_html_fig())
 
 
 @app.route('/add_point', methods=['POST'])
@@ -52,7 +52,7 @@ def add_point():
     if scatter is not None:
         scatter.remove()
     scatter = ax.scatter(df['x'], df['y'], color='r', s=10)
-    return fig_to_html(fig)
+    return get_html_fig()
 
 
 @app.route('/grad_desc', methods=['POST'])
@@ -95,7 +95,7 @@ def gradient_descent():
         converged_text = "Line has converged!"
     else:
         converged_text = "Line has not converged!"
-    return jsonify({'graph': fig_to_html(fig),
+    return jsonify({'graph': get_html_fig(),
                     'converged': converged_text,
                     'cost': round(cost(), 2)})
                     # 'intercept': round(w[0].item(), 4),
@@ -105,6 +105,8 @@ def gradient_descent():
 def cost():
     return np.sum((X @ w - y) ** 2)
 
+def get_html_fig():
+    return fig_to_html(fig, figid="figure")
 
 class MoveAxis(plugins.PluginBase):
     JAVASCRIPT = """
@@ -120,6 +122,7 @@ class MoveAxis(plugins.PluginBase):
             document.getElementsByClassName('mpld3-yaxis')[0].setAttribute('transform', 'translate(248,0)')
             $("g[transform='translate(248.5,0)']").text("")
             $("g[transform='translate(0,185.3)']").text("")
+            $("tspan[dy='11.015625']").attr('dy', "13.015625")
         }
         """
 

@@ -8,29 +8,66 @@
 </head>
 <body>
 <h1>Linear Regression!</h1>
-<div id="lin-reg-graph" onclick="addPoint()">
+<div id="graph" onclick="addPoint()">
     {{ graph | safe }}
 </div>
+<div style="display: flex; flex-direction: column">
+    <p style="text-align: center">Perform Gradient Descent</p>
+    <div id="gd_buttons">
+        <button onclick="gradDesc(1)">1 iteration</button>
+        <button onclick="gradDesc(5)">5 iterations</button>
+        <button onclick="gradDesc(10)">10 iterations</button>
+        <button onclick="gradDesc(100)">100 iterations</button>
+        <button onclick="gradDesc(100_000_000)">Until convergence</button>
+        <button onclick="location.reload()">Clear</button>
+    </div>
+</div>
+<div id='info'>
+    <p>Degree of line: </p>
+    <input type='number' id='num_of_degrees' value='1' min='1'>
 
-<button onclick="gradDesc(1)">1 iteration of Gradient Descent!</button>
-<button onclick="gradDesc(5)">5 iterations of Gradient Descent!</button>
-<button onclick="gradDesc(10)">10 iterations of Gradient Descent!</button>
-<button onclick="gradDesc(100)">100 iterations of Gradient Descent!</button>
-<button onclick="gradDesc(100_000_000)">Gradient Descent until convergence!</button>
-<button onclick="location.reload()">Clear</button>
-<br>
-<p>Degree of line: </p>
-<input type="number" id="num_of_degrees" value="1" min="1">
-
-<p id="converged">Run gradient descent until convergence</p>
-<p id="cost">Cost: <span>0</span></p>
-<p id="intercept">Intercept: <span>0</span></p>
-<p id="slope">Slope: <span>0</span></p>
+    <p id='converged'>Run gradient descent until convergence</p>
+    <p id='cost'>Cost: <span>0</span></p>
+    <p id='intercept'>Intercept: <span>0</span></p>
+    <p id='slope'>Slope: <span>0</span></p>
+</div>
 </body>
 </html>
 <style>
     * {
         font-family: 'Roboto', sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+        margin: 25px 0 0 0;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    #figure {
+        display: flex;
+        justify-content: center;
+    }
+
+    #gd_buttons {
+        display: flex;
+        justify-content: center
+    }
+
+    #gd_buttons button {
+        margin: 0 5px;
+    }
+
+    #info {
+        position: absolute;
+        height: 200px;
+        width: 200px;
+        left: 50%;
+        margin-left: 350px;
+        top: 200px;
     }
 </style>
 <script
@@ -43,6 +80,9 @@
         const point = $(".mpld3-coordinates").text();
         let coordinates = point.matchAll("-?\\d+\\.?\\d+");
         coordinates = Array.from(coordinates)
+        if (coordinates.length === 0) {
+            return
+        }
         const x = parseFloat(coordinates[0][0]);
         const y = parseFloat(coordinates[1][0]);
 
@@ -52,7 +92,7 @@
             data: JSON.stringify({"x": x, "y": y}),
             contentType: "application/json"
         }).done(function (data) {
-            $("#lin-reg-graph").html(data)
+            $("#graph").html(data)
         }).fail(function (data) {
             alert("POST failed");
         });
@@ -60,15 +100,16 @@
 
     function gradDesc(num_of_iterations) {
         const numOfDegrees = $("#num_of_degrees").val();
-        console.log($("#num_of_degrees").val())
         $.ajax({
             type: "POST",
             url: "grad_desc",
-            data: JSON.stringify({"num_of_iterations": num_of_iterations,
-                                  "degree": numOfDegrees}),
+            data: JSON.stringify({
+                "num_of_iterations": num_of_iterations,
+                "degree": numOfDegrees
+            }),
             contentType: "application/json"
         }).done(function (data) {
-            $("#lin-reg-graph").html(data['graph'])
+            $("#graph").html(data['graph'])
             $("#converged").text(data['converged'])
             $("#cost span").text(data['cost'])
             $("#intercept span").text(data['intercept'])
