@@ -2,37 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Linear Regression Visualization</title>
+    <title>ML Visualization Suite</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
 </head>
 <body>
-<h1>Linear Regression!</h1>
-<div id="graph" onclick="addPoint()">
-    {{ graph | safe }}
-</div>
-<div style="display: flex; flex-direction: column">
-    <p style="text-align: center">Perform Gradient Descent</p>
-    <div id="gd_buttons">
-        <button onclick="gradDesc(1)">1 iteration</button>
-        <button onclick="gradDesc(5)">5 iterations</button>
-        <button onclick="gradDesc(10)">10 iterations</button>
-        <button onclick="gradDesc(100)">100 iterations</button>
-        <button onclick="gradDesc(100_000_000)">Until convergence</button>
-        <button onclick="location.reload()">Clear</button>
-    </div>
-</div>
-<div id='info'>
-    <p>Degree of line: </p>
-    <input type='number' id='num_of_degrees' value='1' min='1'>
+<h1>Machine Learning Algorithm Visualizations</h1>
+<div class="cards">
 
-    <p id='converged'>Run gradient descent until convergence</p>
-    <p id='cost'>Cost: <span>0</span></p>
-    <p id='intercept'>Intercept: <span>0</span></p>
-    <p id='slope'>Slope: <span>0</span></p>
 </div>
 </body>
 </html>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
+<script>
+    const algorithmNames = ['Linear Regression', 'Logistic Regression', 'K-Means']
+    const descriptions = [
+        `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed semper, urna eu iaculis accumsan, nulla magna lobortis arcu, sed varius dolor augue id velit. Praesent sit amet justo ut diam placerat fringilla. Maecenas quis egestas nisi. Phasellus commodo rutrum tellus ut aliquet. Praesent consectetur vestibulum augue, in vulputate lacus euismod eget.`,
+        `Phasellus non neque et justo mattis venenatis. Integer in nibh vitae massa volutpat rhoncus non non massa. Donec id fringilla metus, sed consequat nisl. Nunc eget gravida neque, a bibendum nunc. Pellentesque fringilla nunc eget velit suscipit rutrum. Mauris eu consectetur neque, interdum malesuada ante. Etiam tempor neque non magna consequat, eu porta ipsum ullamcorper. In et justo eu arcu porta convallis ultricies sit amet nisl.`,
+        `Aenean sit amet tempor velit, quis sollicitudin dui. Vestibulum tempus nibh in magna auctor facilisis. Curabitur magna mauris, semper a convallis in, eleifend at velit. Aenean tincidunt velit eu luctus dictum. Praesent hendrerit lectus non efficitur hendrerit. Suspendisse maximus sem nunc, nec ultrices elit suscipit ac.`
+    ]
+    const ids = ['linreg', 'logreg', 'kmeans']
+    for (let i = 0; i < algorithmNames.length; i++) {
+        $(".cards").append(`
+            <div class="card" id="` + ids[i] + `">
+                <h2>` + algorithmNames[i] + `</h2>
+                <img src="https://loremflickr.com/320/240?random=` + i + `" alt="` + algorithmNames[i] + `"/>
+                <p>` + descriptions[i] + `</p>
+            </div>
+        `)
+        $("#" + ids[i]).click(function () {
+            window.location.href='/' + ids[i];
+        })
+    }
+</script>
 <style>
     * {
         font-family: 'Roboto', sans-serif;
@@ -40,82 +44,22 @@
 
     h1 {
         text-align: center;
-        margin: 25px 0 0 0;
     }
 
-    p {
-        margin: 0;
-    }
-
-    #figure {
+    .cards {
         display: flex;
         justify-content: center;
     }
 
-    #gd_buttons {
+    .card {
+        width: 400px;
         display: flex;
-        justify-content: center
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
     }
 
-    #gd_buttons button {
-        margin: 0 5px;
-    }
-
-    #info {
-        position: absolute;
-        height: 200px;
-        width: 200px;
-        left: 50%;
-        margin-left: 350px;
-        top: 200px;
+    .card a {
+        text-decoration: none;
     }
 </style>
-<script
-        src="https://code.jquery.com/jquery-3.6.0.min.js"
-        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-        crossorigin="anonymous"></script>
-
-<script>
-    function addPoint() {
-        const point = $(".mpld3-coordinates").text();
-        let coordinates = point.matchAll("-?\\d+\\.?\\d+");
-        coordinates = Array.from(coordinates)
-        if (coordinates.length === 0) {
-            return
-        }
-        const x = parseFloat(coordinates[0][0]);
-        const y = parseFloat(coordinates[1][0]);
-
-        $.ajax({
-            type: "POST",
-            url: "add_point",
-            data: JSON.stringify({"x": x, "y": y}),
-            contentType: "application/json"
-        }).done(function (data) {
-            $("#graph").html(data)
-        }).fail(function (data) {
-            alert("POST failed");
-        });
-    }
-
-    function gradDesc(num_of_iterations) {
-        const numOfDegrees = $("#num_of_degrees").val();
-        $.ajax({
-            type: "POST",
-            url: "grad_desc",
-            data: JSON.stringify({
-                "num_of_iterations": num_of_iterations,
-                "degree": numOfDegrees
-            }),
-            contentType: "application/json"
-        }).done(function (data) {
-            $("#graph").html(data['graph'])
-            $("#converged").text(data['converged'])
-            $("#cost span").text(data['cost'])
-            $("#intercept span").text(data['intercept'])
-            $("#slope span").text(data['slope'])
-        }).fail(function (data) {
-            alert("POST failed");
-        });
-    }
-</script>

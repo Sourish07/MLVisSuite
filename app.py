@@ -26,6 +26,11 @@ og_line_x_vals = np.linspace(x_min, x_max + 1, 100).reshape(-1, 1)
 
 @app.route('/')
 def main():
+    return render_template("index.html")
+
+#### LINEAR REGRESSION ####
+@app.route('/linreg')
+def linear_regression():
     global X, y, fig, ax, w, line, current_degree, df
     df = pd.DataFrame(columns=['x', 'y'], dtype=np.float)
 
@@ -36,10 +41,10 @@ def main():
     mpld3.plugins.clear(fig)
     plugins.connect(fig, plugins.MousePosition(fontsize=0))
     plugins.connect(fig, MoveAxis())
-    return render_template("index.html", graph=get_html_fig())
+    return render_template("linreg.html", graph=get_html_fig())
 
 
-@app.route('/add_point', methods=['POST'])
+@app.route('/linreg-add-point', methods=['POST'])
 def add_point():
     global is_converged, is_new_point_added, scatter
 
@@ -55,7 +60,7 @@ def add_point():
     return get_html_fig()
 
 
-@app.route('/grad_desc', methods=['POST'])
+@app.route('/linreg-grad-desc', methods=['POST'])
 def gradient_descent():
     #global X, y, fig, ax, w, line, is_converged, current_degree, is_new_point_added
     global current_degree, is_new_point_added, X, y, w, is_converged, line, gd_line_x
@@ -89,6 +94,8 @@ def gradient_descent():
             line.pop().remove()
             line = ax.plot(gd_line_x[:, [1]], gd_line_x @ w, color='b', linewidth=3)
 
+    w_list = [round(i.item(), 2) for i in w]
+
     if len(df) == 0:
         converged_text = "Click to add data!"
     elif is_converged:
@@ -97,7 +104,8 @@ def gradient_descent():
         converged_text = "Line has not converged!"
     return jsonify({'graph': get_html_fig(),
                     'converged': converged_text,
-                    'cost': round(cost(), 2)})
+                    'cost': round(cost(), 2),
+                    'coefficients': w_list})
                     # 'intercept': round(w[0].item(), 4),
                     # 'slope': round(w[1].item(), 4))
 
@@ -105,8 +113,20 @@ def gradient_descent():
 def cost():
     return np.sum((X @ w - y) ** 2)
 
+
 def get_html_fig():
     return fig_to_html(fig, figid="figure")
+
+
+@app.route('/logreg')
+def logistic_regression():
+    return "Logistic Regression"
+
+
+@app.route('/kmeans')
+def k_means():
+    return "K-Means"
+
 
 class MoveAxis(plugins.PluginBase):
     JAVASCRIPT = """
