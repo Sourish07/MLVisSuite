@@ -1,0 +1,22 @@
+{% extends "linreg.html" %}
+
+{% block title %}
+    Logistic Regression
+{% endblock %}
+
+{% block name %}
+    Logistic Regression!
+{% endblock %}
+
+{% block choose_class %}
+    <p>Choose class: </p>
+    <div>
+        <input type="radio" id="red" name="class" value="r" checked>
+        <label for="male">red</label>
+    </div>
+    <div>
+        <input type="radio" id="blue" name="class" value="b">
+        <label for="female">blue</label>
+    </div>
+    <br/>
+{% endblock %}

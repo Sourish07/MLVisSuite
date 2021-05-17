@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Linear Regression</title>
+    <title>{% block title %}Linear Regression!{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -10,7 +10,7 @@
         crossorigin="anonymous"></script>
 </head>
 <body>
-<h1>Linear Regression!</h1>
+<h1>{% block name %}Linear Regression!{% endblock %}</h1>
 <div id="graph" onclick="addPoint()">
     {{ graph | safe }}
 </div>
@@ -32,6 +32,8 @@
     <p>Degree of line: </p>
     <input type='number' id='num_of_degrees' value='1' min='1'>
     <br/>
+
+    {% block choose_class %}{% endblock %}
 
     <p>Cost:</p>
     <span id='cost'>0</span>

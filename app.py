@@ -28,6 +28,11 @@ og_line_x_vals = np.linspace(x_min, x_max + 1, 100).reshape(-1, 1)
 def main():
     return render_template("index.html")
 
+
+# @app.route('/clear')
+# def clear_window():
+
+
 #### LINEAR REGRESSION ####
 @app.route('/linreg')
 def linear_regression():
@@ -36,7 +41,7 @@ def linear_regression():
 
     fig, ax = plt.subplots()
     ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
-    line = ax.plot(og_line_x_vals, np.zeros_like(og_line_x_vals), color='b', linewidth=3)
+    line = ax.plot(og_line_x_vals, np.zeros_like(og_line_x_vals), color='k', linewidth=3)
 
     mpld3.plugins.clear(fig)
     plugins.connect(fig, plugins.MousePosition(fontsize=0))
@@ -92,7 +97,7 @@ def gradient_descent():
                 w = z
 
             line.pop().remove()
-            line = ax.plot(gd_line_x[:, [1]], gd_line_x @ w, color='b', linewidth=3)
+            line = ax.plot(gd_line_x[:, [1]], gd_line_x @ w, color='k', linewidth=3)
 
     w_list = [round(i.item(), 3) for i in w]
 
@@ -106,8 +111,6 @@ def gradient_descent():
                     'converged': converged_text,
                     'cost': round(cost(), 2),
                     'coefficients': w_list})
-                    # 'intercept': round(w[0].item(), 4),
-                    # 'slope': round(w[1].item(), 4))
 
 
 def cost():
@@ -120,7 +123,7 @@ def get_html_fig():
 
 @app.route('/logreg')
 def logistic_regression():
-    return "Logistic Regression"
+    return render_template("logreg.html")
 
 
 @app.route('/kmeans')
