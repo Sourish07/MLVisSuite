@@ -35,6 +35,8 @@
 
     <p>Cost:</p>
     <span id='cost'>0</span>
+    <br/>
+
     <p>Equation: </p>
     <span id="equation">0</span>
 </div>
@@ -116,10 +118,10 @@
             }),
             contentType: "application/json"
         }).done(function (data) {
-            console.log(data['coefficients'])
             addEquation(data['coefficients'])
             $("#graph").html(data['graph'])
             $("#converged").text(data['converged'])
+            $("#cost").text(data['cost'])
         }).fail(function (data) {
             alert("POST failed");
         });
@@ -137,25 +139,25 @@
                 } else {
                     html = "+" + coefficients[i] + html
                 }
-            } else if (i === 1 && Math.abs(coefficients[i]) > 1) {
+            } else if (i === 1 && coefficients[i] !== -1 && coefficients[i] !== 1) {
                 if (coefficients[i] < 0) {
                     html = coefficients[i] + "x" + html
                 } else {
                     html = "+" + coefficients[i] + "x" + html
                 }
-            } else if (i === 1 && Math.abs(coefficients[i]) <= 1) {
+            } else if (i === 1 && (coefficients[i] !== -1 || coefficients[i] !== 1)) {
                 if (coefficients[i] < 0) {
                     html = "-x" + html
                 } else {
                     html = "+" + "x" + html
                 }
-            } else if (i > 1 && Math.abs(coefficients[i]) > 1) {
+            } else if (i > 1 && coefficients[i] !== -1 && coefficients[i] !== 1) {
                 if (coefficients[i] < 0) {
                     html = coefficients[i] + "x" + "<sup>" + i + "</sup>" + html
                 } else {
                     html = "+" + coefficients[i] + "x" + "<sup>" + i + "</sup>" + html
                 }
-            } else if (i > 1 && Math.abs(coefficients[i]) <= 1) {
+            } else if (i > 1 && (coefficients[i] !== -1 || coefficients[i] !== 1)) {
                 if (coefficients[i] < 0) {
                     html = "x" + "<sup>" + i + "</sup>" + html
                 } else {

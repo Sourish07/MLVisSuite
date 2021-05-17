@@ -94,7 +94,7 @@ def gradient_descent():
             line.pop().remove()
             line = ax.plot(gd_line_x[:, [1]], gd_line_x @ w, color='b', linewidth=3)
 
-    w_list = [round(i.item(), 2) for i in w]
+    w_list = [round(i.item(), 3) for i in w]
 
     if len(df) == 0:
         converged_text = "Click to add data!"
