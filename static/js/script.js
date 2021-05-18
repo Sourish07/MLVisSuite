@@ -1,4 +1,8 @@
-function addPoint(color) {
+function addPoint() {
+    var color = $("input[name='class']:checked").val()
+    if (!color) {
+        color = "r"
+    }
     const point = $(".mpld3-coordinates").text();
     let coordinates = point.matchAll("-?\\d+\\.?\\d+");
     coordinates = Array.from(coordinates)
@@ -21,7 +25,7 @@ function addPoint(color) {
 }
 
 function gradDesc(numOfIterations, algoName) {
-    const numOfDegrees = $("#num_of_degrees").val();
+    const numOfDegrees = $("input[name='degree']:checked").val()
     $.ajax({
         type: "POST",
         url: algoName,
@@ -86,7 +90,7 @@ function addEquation(coefficients) {
     $("#equation").html(html)
 }
 
-function addPointWrapper() {
+function addPointWithColor() {
     var color = $("input[name='class']:checked").val()
     addPoint(color)
 }

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+    K-Means
+{% endblock %}
+
+{% block name %}
+    K-Means!
+{% endblock %}
+
+{% block content %}
+    <div style="display: flex; flex-direction: column">
+        <p style="text-align: center">Perform K-Means</p>
+        {% block gdButtons %}
+            <div id="gd_buttons">
+                <button onclick="gradDesc(1, 'kmeans-grad-desc')">1 iteration</button>
+                <button onclick="gradDesc(5, 'kmeans-grad-desc')">5 iterations</button>
+                <button onclick="gradDesc(10, 'kmeans-grad-desc')">10 iterations</button>
+                <button onclick="gradDesc(100, 'kmeans-grad-desc')">100 iterations</button>
+                <button onclick="gradDesc(100_000_000, 'kmeans-grad-desc')">Until convergence</button>
+                <button onclick="location.reload()">Clear</button>
+            </div>
+        {% endblock %}
+    </div>
+
+    <div id='info'>
+        <p id='converged'>Run K-Means until convergence</p>
+        <br/>
+
+        <p>Number of Clusters:</p>
+        <div>
+            <input type="radio" id="oneCluster" name="clusters" value="1" checked>
+            <label>1</label>
+        </div>
+        <div>
+            <input type="radio" id="twoClusters" name="clusters" value="2" checked>
+            <label>2</label>
+        </div>
+        <div>
+            <input type="radio" id="threeClusters" name="clusters" value="3" checked>
+            <label>3</label>
+        </div>
+        <br/>
+
+{#        <p>Cost:</p>#}
+{#        <span id='cost'>0</span>#}
+{#        <br/>#}
+    </div>
+{% endblock %}

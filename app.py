@@ -18,12 +18,13 @@ current_degree = None
 is_converged = False
 is_new_point_added = True
 
-epsilon = 1e-4
+epsilon = 1e-6
 
-x_min, x_max = -10, 10
-y_min, y_max = -10, 10
+max_axis_val = 10
+x_min, x_max = -max_axis_val, max_axis_val
+y_min, y_max = x_min, x_max
 
-og_line_x_vals = np.linspace(x_min, x_max + 1, 100).reshape(-1, 1)
+og_line_x_vals = np.linspace(x_min, x_max + 1, 1000).reshape(-1, 1)
 
 # logistic regression variables
 _range = x_max - x_min
@@ -75,8 +76,7 @@ def add_point():
 
 
 @app.route('/linreg-grad-desc', methods=['POST'])
-def gradient_descent():
-    # global X, y, fig, ax, w, line, is_converged, current_degree, is_new_point_added
+def linreg_gradient_descent():
     global current_degree, is_new_point_added, X, y, w, is_converged, line, gd_line_x
     if len(df) != 0:
         new_degree = int(request.get_json()['degree'])
@@ -97,8 +97,9 @@ def gradient_descent():
             is_new_point_added = False
 
         if not is_converged:
-            tau = (1 / (np.linalg.norm(X, ord=2) ** 2)) * 0.999
+            tau = (1 / (np.linalg.norm(X, ord=2) ** 2)) * 0.99 # step size
             for i in range(request.get_json()['num_of_iterations']):
+                print(i)
                 if is_converged:
                     break
                 z = w - tau * X.T @ (X @ w - y)
@@ -131,22 +132,21 @@ def logreg_gradient_descent():
         # If the degree was changed or if a new point was added, we need to recreate the entire X dataset with the
         # higher order features
         if new_degree != current_degree or is_new_point_added:
-            # x_vals = []
-            if new_degree == 1:
-                x_vals = [np.ones((len(df), 1)), df[['x', 'y']].to_numpy()]
-                w = np.zeros((3, 1))
-                new_features = np.stack([np.ones_like(a), a, b], axis=2)
-            elif new_degree == 2:
-                x_vals = [np.ones((len(df), 1)), df[['x', 'y']].to_numpy(), df[['x', 'y']].to_numpy()**2]
-                w = np.zeros((5, 1))
-                new_features = np.stack([np.ones_like(a), a, b, a ** 2, b ** 2], axis=2)
+            x_vals = [np.ones((len(df), 1))]
+            ab = [np.ones_like(a)]
+            for i in range(1, new_degree + 1):
+                x_vals.append(df[['x', 'y']].to_numpy() ** i)
+                ab.extend([a ** i, b ** i])
 
             X = np.hstack(x_vals)
+            new_features = np.stack(ab, axis=2)
             y = df[['class']].replace(["r", "b"], [-1, 1]).to_numpy()
+            w = np.zeros((new_degree * 2 + 1, 1))
 
             current_degree = new_degree
             is_converged = False
             is_new_point_added = False
+
 
         if not is_converged:
             tau = (1 / (np.linalg.norm(X, ord=2) ** 2)) * 0.999
@@ -190,13 +190,17 @@ def get_html_fig():
 
 @app.route('/logreg')
 def logistic_regression():
+    global contour
     clear_window()
+    C = np.stack([a, b], axis=2) @ np.array([[0], [1]])
+    contour = ax.contour(a, b, C.squeeze(), 0, colors='k', linewidths=3)
     return render_template("logreg.html", graph=get_html_fig())
 
 
 @app.route('/kmeans')
 def k_means():
-    return "K-Means"
+    clear_window()
+    return render_template("kmeans.html", graph=get_html_fig())
 
 
 class MoveAxis(plugins.PluginBase):

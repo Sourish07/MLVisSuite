@@ -1,4 +1,4 @@
-{% extends "linreg.html" %}
+{% extends "gdBase.html" %}
 
 {% block title %}
     Logistic Regression
@@ -8,7 +8,13 @@
     Logistic Regression!
 {% endblock %}
 
-{% block choose_class %}
+{% block graph %}
+
+{% endblock %}
+
+{% block nameOfAlgorithm %}Perform Gradient Descent{% endblock %}
+
+{% block chooseClass %}
     <p>Choose class: </p>
     <div>
         <input type="radio" id="red" name="class" value="r" checked>
@@ -21,12 +27,6 @@
     <br/>
 {% endblock %}
 
-{% block parameter %}{% endblock %}
-{% block graph %}
-    <div id="graph" onclick='addPointWrapper()'>
-        {{ graph | safe }}
-    </div>
-{% endblock %}
 
 {% block gdButtons %}
     <div id="gd_buttons">
