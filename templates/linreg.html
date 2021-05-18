@@ -5,32 +5,37 @@
     <title>{% block title %}Linear Regression!{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-        crossorigin="anonymous"></script>
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"></script>
 </head>
 <body>
 <h1>{% block name %}Linear Regression!{% endblock %}</h1>
-<div id="graph" onclick="addPoint()">
-    {{ graph | safe }}
-</div>
+{% block graph %}
+    <div id="graph" onclick='addPoint("r")'>
+        {{ graph | safe }}
+    </div>
+{% endblock %}
 <div style="display: flex; flex-direction: column">
     <p style="text-align: center">Perform Gradient Descent</p>
-    <div id="gd_buttons">
-        <button onclick="gradDesc(1)">1 iteration</button>
-        <button onclick="gradDesc(5)">5 iterations</button>
-        <button onclick="gradDesc(10)">10 iterations</button>
-        <button onclick="gradDesc(100)">100 iterations</button>
-        <button onclick="gradDesc(100_000_000)">Until convergence</button>
-        <button onclick="location.reload()">Clear</button>
-    </div>
+    {% block gdButtons %}
+        <div id="gd_buttons">
+            <button onclick="gradDesc(1, 'linreg-grad-desc')">1 iteration</button>
+            <button onclick="gradDesc(5, 'linreg-grad-desc')">5 iterations</button>
+            <button onclick="gradDesc(10, 'linreg-grad-desc')">10 iterations</button>
+            <button onclick="gradDesc(100, 'linreg-grad-desc')">100 iterations</button>
+            <button onclick="gradDesc(100_000_000, 'linreg-grad-desc')">Until convergence</button>
+            <button onclick="location.reload()">Clear</button>
+        </div>
+    {% endblock %}
 </div>
 <div id='info'>
     <p id='converged'>Run gradient descent until convergence</p>
     <br/>
 
     <p>Degree of line: </p>
-    <input type='number' id='num_of_degrees' value='1' min='1'>
+    <input type='number' id='num_of_degrees' value='1' min='1' max="2">
     <br/>
 
     {% block choose_class %}{% endblock %}
@@ -44,157 +49,5 @@
 </div>
 </body>
 </html>
-<style>
-    * {
-        font-family: 'Roboto', sans-serif;
-    }
 
-    h1 {
-        text-align: center;
-        margin: 25px 0 0 0;
-    }
-
-    p {
-        margin: 0;
-    }
-
-    #figure {
-        display: flex;
-        justify-content: center;
-    }
-
-    #gd_buttons {
-        display: flex;
-        justify-content: center
-    }
-
-    #gd_buttons button {
-        margin: 0 5px;
-    }
-
-    #info {
-        position: absolute;
-        height: 200px;
-        width: 300px;
-        left: 50%;
-        margin-left: 350px;
-        top: 200px;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-</style>
-
-<script>
-    function addPoint() {
-        const point = $(".mpld3-coordinates").text();
-        let coordinates = point.matchAll("-?\\d+\\.?\\d+");
-        coordinates = Array.from(coordinates)
-        if (coordinates.length === 0) {
-            return
-        }
-        const x = parseFloat(coordinates[0][0]);
-        const y = parseFloat(coordinates[1][0]);
-
-        $.ajax({
-            type: "POST",
-            url: "linreg-add-point",
-            data: JSON.stringify({"x": x, "y": y}),
-            contentType: "application/json"
-        }).done(function (data) {
-            $("#graph").html(data)
-        }).fail(function (data) {
-            alert("POST failed");
-        });
-    }
-
-    function gradDesc(num_of_iterations) {
-        const numOfDegrees = $("#num_of_degrees").val();
-        $.ajax({
-            type: "POST",
-            url: "linreg-grad-desc",
-            data: JSON.stringify({
-                "num_of_iterations": num_of_iterations,
-                "degree": numOfDegrees
-            }),
-            contentType: "application/json"
-        }).done(function (data) {
-            addEquation(data['coefficients'])
-            $("#graph").html(data['graph'])
-            $("#converged").text(data['converged'])
-            $("#cost").text(data['cost'])
-        }).fail(function (data) {
-            alert("POST failed");
-        });
-    }
-
-    function addEquation(coefficients) {
-        let html = ""
-        for (let i = 0; i < coefficients.length; i++) {
-            if (coefficients[i] === 0)
-                continue
-
-            if (i === 0) {
-                if (coefficients[i] < 0) {
-                    html = coefficients[i] + html
-                } else {
-                    html = "+" + coefficients[i] + html
-                }
-            } else if (i === 1 && coefficients[i] !== -1 && coefficients[i] !== 1) {
-                if (coefficients[i] < 0) {
-                    html = coefficients[i] + "x" + html
-                } else {
-                    html = "+" + coefficients[i] + "x" + html
-                }
-            } else if (i === 1 && (coefficients[i] !== -1 || coefficients[i] !== 1)) {
-                if (coefficients[i] < 0) {
-                    html = "-x" + html
-                } else {
-                    html = "+" + "x" + html
-                }
-            } else if (i > 1 && coefficients[i] !== -1 && coefficients[i] !== 1) {
-                if (coefficients[i] < 0) {
-                    html = coefficients[i] + "x" + "<sup>" + i + "</sup>" + html
-                } else {
-                    html = "+" + coefficients[i] + "x" + "<sup>" + i + "</sup>" + html
-                }
-            } else if (i > 1 && (coefficients[i] !== -1 || coefficients[i] !== 1)) {
-                if (coefficients[i] < 0) {
-                    html = "x" + "<sup>" + i + "</sup>" + html
-                } else {
-                    html = "+" + "x" + "<sup>" + i + "</sup>" + html
-                }
-            } else {
-                alert("oops")
-            }
-        }
-        if (html.charAt(0) === '+') {
-            html = html.substring(1)
-        }
-        $("#equation").html(html)
-    }
-
-    function addLatex(coefficients) {
-        var string = "$$"
-        for (let i = 0; i < coeffecients.length; i++) {
-            if (i === 0) {
-                string = coeffecients[i] + string
-            } else if (i === 1 && coeffecients[i] !== 0) {
-                if (coeffecients[i] === 1) {
-                    string = "x+" + string
-                } else {
-                    string = coeffecients[i] + "x+" + string
-                }
-            } else if (coeffecients[i] === 1) {
-                string = "x^" + i + "+" + string
-
-            } else if (coeffecients[i] !== 0) {
-                string = coeffecients[i] + "x^" + i + "+" + string
-            }
-        }
-        string = "$$" + string
-        $("#equation").text(string)
-        //MathJax.typeset()
-    }
-</script>
+<script src="/static/js/script.js"></script>

@@ -1,0 +1,39 @@
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+h1 {
+    text-align: center;
+    margin: 25px 0 0 0;
+}
+
+p {
+    margin: 0;
+}
+
+#figure {
+    display: flex;
+    justify-content: center;
+}
+
+#gd_buttons {
+    display: flex;
+    justify-content: center
+}
+
+#gd_buttons button {
+    margin: 0 5px;
+}
+
+#info {
+    position: absolute;
+    height: 200px;
+    width: 300px;
+    left: 50%;
+    margin-left: 350px;
+    top: 200px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

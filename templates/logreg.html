@@ -20,3 +20,21 @@
     </div>
     <br/>
 {% endblock %}
+
+{% block parameter %}{% endblock %}
+{% block graph %}
+    <div id="graph" onclick='addPointWrapper()'>
+        {{ graph | safe }}
+    </div>
+{% endblock %}
+
+{% block gdButtons %}
+    <div id="gd_buttons">
+        <button onclick="gradDesc(1, 'logreg-grad-desc')">1 iteration</button>
+        <button onclick="gradDesc(5, 'logreg-grad-desc')">5 iterations</button>
+        <button onclick="gradDesc(10, 'logreg-grad-desc')">10 iterations</button>
+        <button onclick="gradDesc(100, 'logreg-grad-desc')">100 iterations</button>
+        <button onclick="gradDesc(100_000_000, 'logreg-grad-desc')">Until convergence</button>
+        <button onclick="location.reload()">Clear</button>
+    </div>
+{% endblock %}
