@@ -23,7 +23,7 @@
 {#                <button onclick="gradDesc(5, 'kmeans-grad-desc')">5 iterations</button>#}
 {#                <button onclick="gradDesc(10, 'kmeans-grad-desc')">10 iterations</button>#}
 {#                <button onclick="gradDesc(100, 'kmeans-grad-desc')">100 iterations</button>#}
-                <button onclick="gradDesc(100_000_000, 'kmeans-grad-desc')">Until convergence</button>
+                <button onclick="gradDesc(100_000, 'kmeans-grad-desc')">Until convergence</button>
                 <button onclick="location.reload()">Clear</button>
             </div>
         {% endblock %}
@@ -34,20 +34,20 @@
         <br/>
 
         <p>Number of Clusters:</p>
-        <div>
-            <input type="radio" id="oneCluster" name="clusters" value="1" checked>
-            <label>1</label>
-        </div>
+{#        <div>#}
+{#            <input type="radio" id="oneCluster" name="clusters" value="1" checked>#}
+{#            <label>1</label>#}
+{#        </div>#}
         <div>
             <input type="radio" id="twoClusters" name="clusters" value="2" checked>
             <label>2</label>
         </div>
         <div>
-            <input type="radio" id="threeClusters" name="clusters" value="3" checked>
+            <input type="radio" id="threeClusters" name="clusters" value="3">
             <label>3</label>
         </div>
         <div>
-            <input type="radio" id="fourClusters" name="clusters" value="4" checked>
+            <input type="radio" id="fourClusters" name="clusters" value="4">
             <label>4</label>
         </div>
         <br/>

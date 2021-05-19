@@ -9,13 +9,14 @@ import numpy as np
 app = Flask(__name__)
 
 X, y, w = np.array([]), np.array([]), np.array([])
-fig, ax, line, scatter, gd_line_x = None, None, None, None, None
 df = None
+fig, ax = None, None
+
+line, scatter, gd_line_x = None, None, None
 current_degree = None
 
-
-
 is_converged = False
+converged_text = None
 is_new_point_added = True
 
 epsilon = 1e-6
@@ -32,6 +33,14 @@ a, b = np.meshgrid(np.linspace(-_range / 2, _range / 2, 100), np.linspace(-_rang
 contour = None
 new_features = None
 
+
+# k means variables
+classes = ["r", "b", "g", "c", "m"]
+centroids = None
+k = None
+step_find_closest_centroid = True
+scatter_points = None
+
 @app.route('/')
 def main():
     return render_template("index.html")
@@ -39,8 +48,9 @@ def main():
 
 @app.route('/clear')
 def clear_window():
-    global X, y, fig, ax, w, line, current_degree, df
+    global X, y, fig, ax, w, line, current_degree, df, centroids
     df = pd.DataFrame(columns=['x', 'y', 'class'], dtype=np.float)
+    centroids = None
 
     fig, ax = plt.subplots()
     ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
@@ -112,12 +122,8 @@ def linreg_gradient_descent():
 
     w_list = [round(i.item(), 3) for i in w]
 
-    if len(df) == 0:
-        converged_text = "Click to add data!"
-    elif is_converged:
-        converged_text = "Line has converged!"
-    else:
-        converged_text = "Line has not converged!"
+    update_converged_text()
+
     return jsonify({'graph': get_html_fig(),
                     'converged': converged_text,
                     'cost': round(cost(), 2),
@@ -130,7 +136,7 @@ def logreg_gradient_descent():
     if len(df) != 0:
         new_degree = int(request.get_json()['degree'])
         # If the degree was changed or if a new point was added, we need to recreate the entire X dataset with the
-        # higher order features
+        # higher order features vvv
         if new_degree != current_degree or is_new_point_added:
             x_vals = [np.ones((len(df), 1))]
             ab = [np.ones_like(a)]
@@ -167,12 +173,7 @@ def logreg_gradient_descent():
 
     w_list = [round(i.item(), 3) for i in w]
 
-    if len(df) == 0:
-        converged_text = "Click to add data!"
-    elif is_converged:
-        converged_text = "Line has converged!"
-    else:
-        converged_text = "Line has not converged!"
+    update_converged_text()
 
     return jsonify({'graph': get_html_fig(),
                     'converged': converged_text,
@@ -183,6 +184,14 @@ def logreg_gradient_descent():
 def cost():
     return np.sum((X @ w - y) ** 2)
 
+def update_converged_text():
+    global converged_text
+    if len(df) == 0:
+        converged_text = "Click to add data!"
+    elif is_converged:
+        converged_text = "Line has converged!"
+    else:
+        converged_text = "Line has not converged!"
 
 def get_html_fig():
     return fig_to_html(fig, figid="figure")
@@ -199,8 +208,70 @@ def logistic_regression():
 
 @app.route('/kmeans')
 def k_means():
+    global step_find_closest_centroid
     clear_window()
+    step_find_closest_centroid = True
     return render_template("kmeans.html", graph=get_html_fig())
+
+
+@app.route('/kmeans-iteration', methods=['POST'])
+def k_means_iteration():
+    global centroids, k, is_converged, step_find_closest_centroid, scatter_points, fig, ax
+    if len(df) != 0:
+        if centroids is None or k != int(request.get_json()['num_of_clusters']):
+            k = int(request.get_json()['num_of_clusters'])
+            print(df)
+            centroids = df.sample(k)
+            centroids['class'] = classes[:k]
+            centroids.set_index('class', inplace=True)
+
+        if not is_converged:
+            if step_find_closest_centroid:
+                df['class'] = df.apply(find_closest_centroid, axis=1)
+
+            else:
+                new_centroids = pd.DataFrame(centroids.apply(move_centroids, axis=1).to_list(), columns=['x', 'y'])
+                if centroids['x'].to_list() == new_centroids['x'].to_list() and centroids['y'].to_list() == \
+                        new_centroids['y'].to_list():
+                    is_converged = True
+                centroids['x'], centroids['y'] = new_centroids['x'].to_list(), new_centroids['y'].to_list()
+
+            ax.clear()
+            ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
+
+            ax.scatter(df['x'], df['y'], c=df['class'], s=100)
+            for i, row in centroids.iterrows():
+                ax.scatter(row['x'], row['y'], c=row.name, marker="*", s=500, alpha=0.3)
+            step_find_closest_centroid = not step_find_closest_centroid
+
+        update_converged_text()
+
+        return jsonify({'graph': get_html_fig(),
+                        'converged': converged_text})
+
+
+def find_closest_centroid(row):
+    closest_distance = None
+    closest_centroid = None
+    for i, coord in centroids.iterrows():
+        distance = np.linalg.norm(row.to_numpy()[:2] - coord.to_numpy())
+        if closest_distance is None or distance < closest_distance:
+            closest_distance = distance
+            closest_centroid = i
+    return closest_centroid
+
+
+def move_centroids(row):
+    x_sum = 0
+    y_sum = 0
+    num_of_points = 0
+    for i, point in df.iterrows():
+        if row.name == point['class']:
+            x_sum += point['x']
+            y_sum += point['y']
+            num_of_points += 1
+
+    return x_sum / num_of_points, y_sum / num_of_points
 
 
 class MoveAxis(plugins.PluginBase):

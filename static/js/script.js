@@ -79,8 +79,6 @@ function addEquation(coefficients) {
             } else {
                 html = "+" + "x" + "<sup>" + i + "</sup>" + html
             }
-        } else {
-            alert("oops")
         }
     }
     if (html.charAt(0) === '+') {
@@ -90,13 +88,14 @@ function addEquation(coefficients) {
 }
 
 function kMeans(numOfIterations) {
-    const numOfClusters = $("input[name='degree']:checked").val()
+    const numOfClusters = $("input[name='clusters']:checked").val()
+    console.log(numOfClusters)
     $.ajax({
         type: "POST",
-        url: 'kmeans-grad-desc',
+        url: 'kmeans-iteration',
         data: JSON.stringify({
             "num_of_iterations": numOfIterations,
-            "degree": numOfClusters
+            "num_of_clusters": numOfClusters
         }),
         contentType: "application/json"
     }).done(function (data) {
