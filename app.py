@@ -285,7 +285,6 @@ def kmeans_return():
 @app.route("/kmeans-reinitialize", methods=["POST"])
 def reinitialize_centroids():
     global k, centroids, step_find_closest_centroid, is_converged
-    print(request)
     k = int(request.get_json()['num_of_clusters'])
     if len(df) >= k:
         centroids = df.sample(k)
