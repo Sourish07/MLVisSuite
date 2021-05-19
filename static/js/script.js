@@ -97,10 +97,7 @@ function kMeans(numOfIterations) {
             "num_of_clusters": numOfClusters
         }),
         contentType: "application/json"
-    }).done(function (data) {
-        $("#graph").html(data['graph'])
-        $("#converged").text(data['converged'])
-    }).fail(function (data) {
+    }).done(updateKMeansInfo).fail(function (data) {
         alert("POST failed");
     });
 }
@@ -114,10 +111,13 @@ function reinitializeCentroids() {
             "num_of_clusters": numOfClusters
         }),
         contentType: "application/json"
-    }).done(function (data) {
-        $("#graph").html(data['graph'])
-        $("#converged").text(data['converged'])
-    }).fail(function (data) {
+    }).done(updateKMeansInfo).fail(function (data) {
         alert("POST failed");
     });
+}
+
+function updateKMeansInfo(data) {
+    $("#graph").html(data['graph'])
+    $("#converged").text(data['converged'])
+    $("#next_step").text(data['next_step'])
 }

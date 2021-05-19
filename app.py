@@ -212,6 +212,7 @@ def k_means_iteration():
                 centroids['class'] = classes[:k]
                 centroids.set_index('class', inplace=True)
             step_find_closest_centroid = True
+            is_converged = False
 
         if not is_converged and len(df) >= new_k:
             for i in range(request.get_json()['num_of_iterations']):
@@ -231,16 +232,7 @@ def k_means_iteration():
 
     update_converged_text()
 
-    return jsonify({'graph': get_html_fig(),
-                    'converged': info_text})
-
-def redraw_kmeans():
-    ax.clear()
-    ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
-
-    ax.scatter(df['x'], df['y'], color=df['class'], s=10)
-    for i, row in centroids.iterrows():
-        ax.scatter(row['x'], row['y'], color=row.name, marker="*", s=500, alpha=0.5)
+    return kmeans_return()
 
 
 def find_closest_centroid(row):
@@ -267,9 +259,33 @@ def move_centroids(row):
     return x_sum / num_of_points, y_sum / num_of_points
 
 
+def redraw_kmeans():
+    ax.clear()
+    ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
+
+    ax.scatter(df['x'], df['y'], color=df['class'], s=10)
+    for i, row in centroids.iterrows():
+        ax.scatter(row['x'], row['y'], color=row.name, marker="*", s=500, alpha=0.5)
+
+
+def kmeans_return():
+    if is_converged:
+        next_step = "Centroids haven't moved"
+    elif step_find_closest_centroid:
+        next_step = "Click to recolor the points based on closest centroid"
+    else:
+        next_step = "Click to move the centroids to the average of the points in their clusters"
+
+    return jsonify({'graph': get_html_fig(),
+                    'converged': info_text,
+                    'next_step': next_step})
+
+
+
 @app.route("/kmeans-reinitialize", methods=["POST"])
 def reinitialize_centroids():
     global k, centroids, step_find_closest_centroid, is_converged
+    print(request)
     k = int(request.get_json()['num_of_clusters'])
     if len(df) >= k:
         centroids = df.sample(k)
@@ -283,8 +299,7 @@ def reinitialize_centroids():
 
     redraw_kmeans()
     update_converged_text()
-    return jsonify({'graph': get_html_fig(),
-                    'converged': info_text})
+    return kmeans_return()
 
 
 #### HELPER FUNCTIONS ####
