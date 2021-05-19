@@ -89,7 +89,6 @@ function addEquation(coefficients) {
 
 function kMeans(numOfIterations) {
     const numOfClusters = $("input[name='clusters']:checked").val()
-    console.log(numOfClusters)
     $.ajax({
         type: "POST",
         url: 'kmeans-iteration',
@@ -99,7 +98,23 @@ function kMeans(numOfIterations) {
         }),
         contentType: "application/json"
     }).done(function (data) {
-        //addEquation(data['coefficients'])
+        $("#graph").html(data['graph'])
+        $("#converged").text(data['converged'])
+    }).fail(function (data) {
+        alert("POST failed");
+    });
+}
+
+function reinitializeCentroids() {
+    const numOfClusters = $("input[name='clusters']:checked").val()
+    $.ajax({
+        type: "POST",
+        url: 'kmeans-reinitialize',
+        data: JSON.stringify({
+            "num_of_clusters": numOfClusters
+        }),
+        contentType: "application/json"
+    }).done(function (data) {
         $("#graph").html(data['graph'])
         $("#converged").text(data['converged'])
     }).fail(function (data) {

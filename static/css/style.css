@@ -16,10 +16,23 @@ body {
 
 }
 
+.menu-links a {
+    margin-left: 10px;
+}
+
 h1 {
     text-align: center;
     margin: 25px 0 0 0;
     /*display: block;*/
+}
+
+a {
+    text-decoration: none;
+}
+
+a:active,
+a:visited {
+    color: black;
 }
 
 p {
@@ -29,6 +42,10 @@ p {
 #figure {
     display: flex;
     justify-content: center;
+    -webkit-user-select: none; /* Chrome all / Safari all */
+    -moz-user-select: none; /* Firefox all */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none;
 }
 
 #gd_buttons {

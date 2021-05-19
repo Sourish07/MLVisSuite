@@ -16,7 +16,7 @@ line, scatter, gd_line_x = None, None, None
 current_degree = None
 
 is_converged = False
-converged_text = None
+info_text = None
 is_new_point_added = True
 
 epsilon = 1e-6
@@ -60,15 +60,6 @@ def clear_window():
     plugins.connect(fig, MoveAxis())
 
 
-#### LINEAR REGRESSION ####
-@app.route('/linreg')
-def linear_regression():
-    global line
-    clear_window()
-    line = ax.plot(og_line_x_vals, np.zeros_like(og_line_x_vals), color='k', linewidth=3)
-    return render_template("linreg.html", graph=get_html_fig())
-
-
 @app.route('/add-point', methods=['POST'])
 def add_point():
     global is_converged, is_new_point_added, scatter
@@ -83,6 +74,15 @@ def add_point():
         scatter.remove()
     scatter = ax.scatter(df['x'], df['y'], color=df['class'], s=10)
     return get_html_fig()
+
+
+#### LINEAR REGRESSION ####
+@app.route('/linreg')
+def linear_regression():
+    global line
+    clear_window()
+    line = ax.plot(og_line_x_vals, np.zeros_like(og_line_x_vals), color='k', linewidth=3)
+    return render_template("linreg.html", graph=get_html_fig())
 
 
 @app.route('/linreg-grad-desc', methods=['POST'])
@@ -109,7 +109,6 @@ def linreg_gradient_descent():
         if not is_converged:
             tau = (1 / (np.linalg.norm(X, ord=2) ** 2)) * 0.99 # step size
             for i in range(request.get_json()['num_of_iterations']):
-                print(i)
                 if is_converged:
                     break
                 z = w - tau * X.T @ (X @ w - y)
@@ -125,9 +124,19 @@ def linreg_gradient_descent():
     update_converged_text()
 
     return jsonify({'graph': get_html_fig(),
-                    'converged': converged_text,
+                    'converged': info_text,
                     'cost': round(cost(), 2),
                     'coefficients': w_list})
+
+
+#### LOGISTIC REGRESSION ####
+@app.route('/logreg')
+def logistic_regression():
+    global contour
+    clear_window()
+    C = np.stack([a, b], axis=2) @ np.array([[0], [1]])
+    contour = ax.contour(a, b, C.squeeze(), 0, colors='k', linewidths=3)
+    return render_template("logreg.html", graph=get_html_fig())
 
 
 @app.route('/logreg-grad-desc', methods=['POST'])
@@ -176,36 +185,12 @@ def logreg_gradient_descent():
     update_converged_text()
 
     return jsonify({'graph': get_html_fig(),
-                    'converged': converged_text,
+                    'converged': info_text,
                     'cost': round(cost(), 2),
                     'coefficients': w_list})
 
 
-def cost():
-    return np.sum((X @ w - y) ** 2)
-
-def update_converged_text():
-    global converged_text
-    if len(df) == 0:
-        converged_text = "Click to add data!"
-    elif is_converged:
-        converged_text = "Line has converged!"
-    else:
-        converged_text = "Line has not converged!"
-
-def get_html_fig():
-    return fig_to_html(fig, figid="figure")
-
-
-@app.route('/logreg')
-def logistic_regression():
-    global contour
-    clear_window()
-    C = np.stack([a, b], axis=2) @ np.array([[0], [1]])
-    contour = ax.contour(a, b, C.squeeze(), 0, colors='k', linewidths=3)
-    return render_template("logreg.html", graph=get_html_fig())
-
-
+#### K-MEANS ####
 @app.route('/kmeans')
 def k_means():
     global step_find_closest_centroid
@@ -217,37 +202,45 @@ def k_means():
 @app.route('/kmeans-iteration', methods=['POST'])
 def k_means_iteration():
     global centroids, k, is_converged, step_find_closest_centroid, scatter_points, fig, ax
+    new_k = int(request.get_json()['num_of_clusters'])
+
     if len(df) != 0:
-        if centroids is None or k != int(request.get_json()['num_of_clusters']):
-            k = int(request.get_json()['num_of_clusters'])
-            print(df)
-            centroids = df.sample(k)
-            centroids['class'] = classes[:k]
-            centroids.set_index('class', inplace=True)
+        if centroids is None or k != new_k:
+            k = new_k
+            if len(df) >= new_k:
+                centroids = df.sample(k)
+                centroids['class'] = classes[:k]
+                centroids.set_index('class', inplace=True)
+            step_find_closest_centroid = True
 
-        if not is_converged:
-            if step_find_closest_centroid:
-                df['class'] = df.apply(find_closest_centroid, axis=1)
+        if not is_converged and len(df) >= new_k:
+            for i in range(request.get_json()['num_of_iterations']):
+                if is_converged:
+                    break
+                if step_find_closest_centroid:
+                    df['class'] = df.apply(find_closest_centroid, axis=1)
+                else:
+                    new_centroids = pd.DataFrame(centroids.apply(move_centroids, axis=1).to_list(), columns=['x', 'y'])
+                    if centroids['x'].to_list() == new_centroids['x'].to_list() and centroids['y'].to_list() == \
+                            new_centroids['y'].to_list():
+                        is_converged = True
+                    centroids['x'], centroids['y'] = new_centroids['x'].to_list(), new_centroids['y'].to_list()
+                step_find_closest_centroid = not step_find_closest_centroid
 
-            else:
-                new_centroids = pd.DataFrame(centroids.apply(move_centroids, axis=1).to_list(), columns=['x', 'y'])
-                if centroids['x'].to_list() == new_centroids['x'].to_list() and centroids['y'].to_list() == \
-                        new_centroids['y'].to_list():
-                    is_converged = True
-                centroids['x'], centroids['y'] = new_centroids['x'].to_list(), new_centroids['y'].to_list()
+            redraw_kmeans()
 
-            ax.clear()
-            ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
+    update_converged_text()
 
-            ax.scatter(df['x'], df['y'], c=df['class'], s=100)
-            for i, row in centroids.iterrows():
-                ax.scatter(row['x'], row['y'], c=row.name, marker="*", s=500, alpha=0.3)
-            step_find_closest_centroid = not step_find_closest_centroid
+    return jsonify({'graph': get_html_fig(),
+                    'converged': info_text})
 
-        update_converged_text()
+def redraw_kmeans():
+    ax.clear()
+    ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
 
-        return jsonify({'graph': get_html_fig(),
-                        'converged': converged_text})
+    ax.scatter(df['x'], df['y'], color=df['class'], s=10)
+    for i, row in centroids.iterrows():
+        ax.scatter(row['x'], row['y'], color=row.name, marker="*", s=500, alpha=0.5)
 
 
 def find_closest_centroid(row):
@@ -272,6 +265,47 @@ def move_centroids(row):
             num_of_points += 1
 
     return x_sum / num_of_points, y_sum / num_of_points
+
+
+@app.route("/kmeans-reinitialize", methods=["POST"])
+def reinitialize_centroids():
+    global k, centroids, step_find_closest_centroid, is_converged
+    k = int(request.get_json()['num_of_clusters'])
+    if len(df) >= k:
+        centroids = df.sample(k)
+        centroids['class'] = classes[:k]
+        centroids.set_index('class', inplace=True)
+
+    step_find_closest_centroid = False
+    is_converged = False
+
+    df['class'] = df.apply(find_closest_centroid, axis=1)
+
+    redraw_kmeans()
+    update_converged_text()
+    return jsonify({'graph': get_html_fig(),
+                    'converged': info_text})
+
+
+#### HELPER FUNCTIONS ####
+def cost():
+    return np.sum((X @ w - y) ** 2)
+
+
+def get_html_fig():
+    return fig_to_html(fig, figid="figure")
+
+
+def update_converged_text():
+    global info_text
+    if len(df) == 0:
+        info_text = "Click to add data"
+    elif k is not None and len(df) < k:
+        info_text = "Add more data points than clusters"
+    elif is_converged:
+        info_text = "Algorithm has converged"
+    else:
+        info_text = "Algorithm has not converged"
 
 
 class MoveAxis(plugins.PluginBase):
