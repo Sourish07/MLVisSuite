@@ -8,15 +8,21 @@
     K-Means!
 {% endblock %}
 
+{% block graph %}
+<div id="graph" onclick='addPoint("k")'>
+    {{ graph | safe }}
+</div>
+{% endblock %}
+
 {% block content %}
     <div style="display: flex; flex-direction: column">
         <p style="text-align: center">Perform K-Means</p>
         {% block gdButtons %}
             <div id="gd_buttons">
-                <button onclick="gradDesc(1, 'kmeans-grad-desc')">1 iteration</button>
-                <button onclick="gradDesc(5, 'kmeans-grad-desc')">5 iterations</button>
-                <button onclick="gradDesc(10, 'kmeans-grad-desc')">10 iterations</button>
-                <button onclick="gradDesc(100, 'kmeans-grad-desc')">100 iterations</button>
+                <button onclick="kMeans(1)">1 iteration</button>
+{#                <button onclick="gradDesc(5, 'kmeans-grad-desc')">5 iterations</button>#}
+{#                <button onclick="gradDesc(10, 'kmeans-grad-desc')">10 iterations</button>#}
+{#                <button onclick="gradDesc(100, 'kmeans-grad-desc')">100 iterations</button>#}
                 <button onclick="gradDesc(100_000_000, 'kmeans-grad-desc')">Until convergence</button>
                 <button onclick="location.reload()">Clear</button>
             </div>
@@ -39,6 +45,10 @@
         <div>
             <input type="radio" id="threeClusters" name="clusters" value="3" checked>
             <label>3</label>
+        </div>
+        <div>
+            <input type="radio" id="fourClusters" name="clusters" value="4" checked>
+            <label>4</label>
         </div>
         <br/>
 

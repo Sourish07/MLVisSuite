@@ -26,9 +26,7 @@
     <a href="/kmeans">K-Means</a>
 </div>
 
-<div id="graph" onclick='addPoint()'>
-    {{ graph | safe }}
-</div>
+{% block graph %}{% endblock %}
 
 {% block content %}{% endblock %}
 </body>

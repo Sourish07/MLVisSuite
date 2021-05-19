@@ -9,7 +9,9 @@
 {% endblock %}
 
 {% block graph %}
-
+<div id="graph" onclick='addPoint(null)'>
+    {{ graph | safe }}
+</div>
 {% endblock %}
 
 {% block nameOfAlgorithm %}Perform Gradient Descent{% endblock %}

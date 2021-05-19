@@ -1,7 +1,6 @@
-function addPoint() {
-    var color = $("input[name='class']:checked").val()
+function addPoint(color) {
     if (!color) {
-        color = "r"
+        color = $("input[name='class']:checked").val()
     }
     const point = $(".mpld3-coordinates").text();
     let coordinates = point.matchAll("-?\\d+\\.?\\d+");
@@ -90,7 +89,21 @@ function addEquation(coefficients) {
     $("#equation").html(html)
 }
 
-function addPointWithColor() {
-    var color = $("input[name='class']:checked").val()
-    addPoint(color)
+function kMeans(numOfIterations) {
+    const numOfClusters = $("input[name='degree']:checked").val()
+    $.ajax({
+        type: "POST",
+        url: 'kmeans-grad-desc',
+        data: JSON.stringify({
+            "num_of_iterations": numOfIterations,
+            "degree": numOfClusters
+        }),
+        contentType: "application/json"
+    }).done(function (data) {
+        //addEquation(data['coefficients'])
+        $("#graph").html(data['graph'])
+        $("#converged").text(data['converged'])
+    }).fail(function (data) {
+        alert("POST failed");
+    });
 }
