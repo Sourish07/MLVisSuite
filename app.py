@@ -150,8 +150,8 @@ def logreg_gradient_descent():
             x_vals = [np.ones((len(df), 1))]
             ab = [np.ones_like(a)]
             for i in range(1, new_degree + 1):
-                x_vals.append(df[['x', 'y']].to_numpy() ** i)
-                ab.extend([a ** i, b ** i])
+                x_vals.append(df[['y', 'x']].to_numpy() ** i)
+                ab.extend([b ** i, a ** i])
 
             X = np.hstack(x_vals)
             new_features = np.stack(ab, axis=2)

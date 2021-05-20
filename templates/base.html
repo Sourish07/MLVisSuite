@@ -29,6 +29,20 @@
 {% block graph %}{% endblock %}
 
 {% block content %}{% endblock %}
+
+<button id="more-info">{% block modalButtonText %}{% endblock %}</button>
+
+
+<div id="info-modal">
+    <div id="info-modal-content">
+        {% block moreInfoModalContent %}{% endblock %}
+        <span id="modal-close">&times;</span>
+    </div>
+</div>
+
+
+
+
 </body>
 </html>
 

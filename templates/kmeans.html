@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block name %}
-    K-Means!
+    K-Means Visualization
 {% endblock %}
 
 {% block graph %}
@@ -18,7 +18,7 @@
     <div style="display: flex; flex-direction: column">
         <p style="text-align: center">Perform K-Means</p>
         {% block gdButtons %}
-            <div id="gd_buttons">
+            <div id="iter_buttons">
                 <button onclick="kMeans(1)">1 iteration</button>
                 <button onclick="kMeans(100_000)">Until convergence</button>
                 <button onclick="reinitializeCentroids()">Reinitialize centroids</button>
@@ -29,9 +29,6 @@
 
     <div id='info'>
         <p id='converged'>Run K-Means until convergence</p>
-        <br/>
-
-        <p id='next_step'>Initialize centroids</p>
         <br/>
 
         <p>Number of Clusters:</p>
@@ -53,8 +50,27 @@
         </div>
         <br/>
 
-{#        <p>Cost:</p>#}
-{#        <span id='cost'>0</span>#}
-{#        <br/>#}
+        <p id='next_step'>Initialize centroids</p>
     </div>
+{% endblock %}
+
+{% block modalButtonText %}
+    How does K-Means work?
+{% endblock %}
+
+{% block moreInfoModalContent %}
+    <h2>How K-Means Works</h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eu neque quis nunc ultrices lobortis a eget
+        erat. Fusce viverra neque non sapien scelerisque, quis viverra mauris lobortis. Nam eu nisl ipsum. Curabitur
+        feugiat vitae tortor eget ullamcorper. Ut ultrices dolor et leo ornare, vel rutrum orci euismod. Integer ornare
+        suscipit tristique. Mauris gravida ex condimentum varius vulputate. Mauris at suscipit tortor, vitae varius
+        nisl.</p>
+    <br/>
+    <p>Vestibulum lacinia eros vel urna mollis dignissim. Nunc porta imperdiet enim non pharetra. Curabitur enim
+        velit, lacinia ac massa non, iaculis porttitor dolor. In massa sem, pharetra non augue at, faucibus tempor
+        erat. Nunc
+        at volutpat risus. Nunc nisi ante, condimentum vel imperdiet sit amet, congue ac enim. Aenean feugiat pharetra
+        est ut iaculis. Donec libero libero, accumsan sed hendrerit vitae, vulputate in purus. Nulla quis justo id odio
+        sollicitudin feugiat eu quis lectus. Cras vitae dui congue, fermentum sapien sit amet, dictum mi. Curabitur id
+        ultrices tellus, in scelerisque tortor. Morbi et elit at dolor venenatis interdum a non dolor.</p>
 {% endblock %}

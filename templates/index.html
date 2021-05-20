@@ -24,12 +24,12 @@
         `Aenean sit amet tempor velit, quis sollicitudin dui. Vestibulum tempus nibh in magna auctor facilisis. Curabitur magna mauris, semper a convallis in, eleifend at velit. Aenean tincidunt velit eu luctus dictum. Praesent hendrerit lectus non efficitur hendrerit. Suspendisse maximus sem nunc, nec ultrices elit suscipit ac.`
     ]
     const ids = ['linreg', 'logreg', 'kmeans']
-    const imgs = ['LinearRegression.png', 'LogisticRegression.png', 'KMeans.png']
+    const images = ['LinearRegression.png', 'LogisticRegression.png', 'KMeans.png']
     for (let i = 0; i < algorithmNames.length; i++) {
         $(".cards").append(`
             <div class="card" id="` + ids[i] + `">
                 <h2>` + algorithmNames[i] + `</h2>
-                <img src="/static/images/` + imgs[i] + `" alt="` + algorithmNames[i] + `"/>
+                <img src="/static/images/` + images[i] + `" alt="` + algorithmNames[i] + `"/>
                 <p>` + descriptions[i] + `</p>
             </div>
         `)

@@ -1,3 +1,18 @@
+$("#more-info").on("click", function (e) {
+    $("#info-modal").fadeIn()
+})
+
+$("#modal-close").on("click", function (e) {
+    $("#info-modal").fadeOut()
+})
+
+$(window).on("click", function (e) {
+    if (e.target.id === "info-modal") {
+        $("#info-modal").fadeOut()
+    }
+})
+
+
 function addPoint(color) {
     if (!color) {
         color = $("input[name='class']:checked").val()
@@ -34,7 +49,12 @@ function gradDesc(numOfIterations, algoName) {
         }),
         contentType: "application/json"
     }).done(function (data) {
-        addEquation(data['coefficients'])
+        if (algoName === "linreg-grad-desc") {
+            $("#equation").html(addLinRegEquation(data['coefficients']))
+
+        } else if (algoName === "logreg-grad-desc") {
+            $("#equation").html(addLogRegEquation(data['coefficients']))
+        }
         $("#graph").html(data['graph'])
         $("#converged").text(data['converged'])
         $("#cost").text(data['cost'])
@@ -43,7 +63,7 @@ function gradDesc(numOfIterations, algoName) {
     });
 }
 
-function addEquation(coefficients) {
+function addLinRegEquation(coefficients) {
     let html = ""
     for (let i = 0; i < coefficients.length; i++) {
         if (coefficients[i] === 0)
@@ -84,7 +104,60 @@ function addEquation(coefficients) {
     if (html.charAt(0) === '+') {
         html = html.substring(1)
     }
-    $("#equation").html(html)
+    return html
+}
+
+function addLogRegEquation(coefficients) {
+    let html = ""
+    for (let i = 0; i < coefficients.length; i++) {
+        if (coefficients[i] === 0)
+            continue
+
+        const exponent = Math.ceil(i / 2);
+
+        let xVar = ""
+        if (Number.isInteger(i / 2)) {
+            xVar = "x" + "<sub>1</sub>"
+        } else {
+            xVar = "x" + "<sub>2</sub>"
+        }
+
+        if (exponent === 0) {
+            if (coefficients[i] < 0) {
+                html = coefficients[i] + html
+            } else {
+                html = "+" + coefficients[i] + html
+            }
+        } else if (exponent === 1 && coefficients[i] !== -1 && coefficients[i] !== 1) {
+            if (coefficients[i] < 0) {
+                html = coefficients[i] + xVar + html
+            } else {
+                html = "+" + coefficients[i] + xVar + html
+            }
+        } else if (exponent === 1 && (coefficients[i] !== -1 || coefficients[i] !== 1)) {
+            if (coefficients[i] < 0) {
+                html = "-" + xVar + html
+            } else {
+                html = "+" + xVar + html
+            }
+        } else if (exponent > 1 && coefficients[i] !== -1 && coefficients[i] !== 1) {
+            if (coefficients[i] < 0) {
+                html = coefficients[i] + xVar + "<sup>" + exponent + "</sup>" + html
+            } else {
+                html = "+" + coefficients[i] + xVar + "<sup>" + exponent + "</sup>" + html
+            }
+        } else if (exponent > 1 && (coefficients[i] !== -1 || coefficients[i] !== 1)) {
+            if (coefficients[i] < 0) {
+                html = xVar + "<sup>" + exponent + "</sup>" + html
+            } else {
+                html = "+" + xVar + "<sup>" + exponent + "</sup>" + html
+            }
+        }
+    }
+    if (html.charAt(0) === '+') {
+        html = html.substring(1)
+    }
+    return html
 }
 
 function kMeans(numOfIterations) {

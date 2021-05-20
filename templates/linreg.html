@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block name %}
-    Linear Regression!
+    Linear Regression Visualization
 {% endblock %}
 
 {% block graph %}
@@ -15,12 +15,33 @@
 {% endblock %}
 
 {% block gdButtons %}
-    <div id="gd_buttons">
-            <button onclick="gradDesc(1, 'linreg-grad-desc')">1 iteration</button>
-            <button onclick="gradDesc(5, 'linreg-grad-desc')">5 iterations</button>
-            <button onclick="gradDesc(10, 'linreg-grad-desc')">10 iterations</button>
-            <button onclick="gradDesc(100, 'linreg-grad-desc')">100 iterations</button>
-            <button onclick="gradDesc(100_000_000, 'linreg-grad-desc')">Until convergence</button>
-            <button onclick="location.reload()">Clear</button>
-        </div>
+    <div id="iter_buttons">
+        <button onclick="gradDesc(1, 'linreg-grad-desc')">1 iteration</button>
+        <button onclick="gradDesc(5, 'linreg-grad-desc')">5 iterations</button>
+        <button onclick="gradDesc(10, 'linreg-grad-desc')">10 iterations</button>
+        <button onclick="gradDesc(100, 'linreg-grad-desc')">100 iterations</button>
+        <button onclick="gradDesc(100_000_000, 'linreg-grad-desc')">Until convergence</button>
+        <button onclick="location.reload()">Clear</button>
+    </div>
+{% endblock %}
+
+{% block modalButtonText %}
+    How does Linear Regression work?
+{% endblock %}
+
+{% block moreInfoModalContent %}
+    <h2>How Linear Regression Works</h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eu neque quis nunc ultrices lobortis a eget
+        erat. Fusce viverra neque non sapien scelerisque, quis viverra mauris lobortis. Nam eu nisl ipsum. Curabitur
+        feugiat vitae tortor eget ullamcorper. Ut ultrices dolor et leo ornare, vel rutrum orci euismod. Integer ornare
+        suscipit tristique. Mauris gravida ex condimentum varius vulputate. Mauris at suscipit tortor, vitae varius
+        nisl.</p>
+    <br/>
+    <p>Vestibulum lacinia eros vel urna mollis dignissim. Nunc porta imperdiet enim non pharetra. Curabitur enim
+        velit, lacinia ac massa non, iaculis porttitor dolor. In massa sem, pharetra non augue at, faucibus tempor
+        erat. Nunc
+        at volutpat risus. Nunc nisi ante, condimentum vel imperdiet sit amet, congue ac enim. Aenean feugiat pharetra
+        est ut iaculis. Donec libero libero, accumsan sed hendrerit vitae, vulputate in purus. Nulla quis justo id odio
+        sollicitudin feugiat eu quis lectus. Cras vitae dui congue, fermentum sapien sit amet, dictum mi. Curabitur id
+        ultrices tellus, in scelerisque tortor. Morbi et elit at dolor venenatis interdum a non dolor.</p>
 {% endblock %}
