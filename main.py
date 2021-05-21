@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, render_template
-from flask_sslify import SSLify
 import matplotlib.pyplot as plt, mpld3
 from mpld3 import fig_to_html, plugins
 import pandas as pd
