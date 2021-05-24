@@ -11,6 +11,9 @@
 <div class="cards">
 
 </div>
+{#<div class="ml-button">#}
+{#    <button>What is Machine Learning?</button>#}
+{#</div>#}
 </body>
 </html>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -34,7 +37,7 @@
             </div>
         `)
         $("#" + ids[i]).click(function () {
-            window.location.href='/' + ids[i];
+            window.location.href = '/' + ids[i];
         })
     }
 </script>
@@ -66,5 +69,10 @@
 
     .card a {
         text-decoration: none;
+    }
+
+    .ml-button {
+        display: block;
+        margin: auto;
     }
 </style>
