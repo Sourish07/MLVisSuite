@@ -33,8 +33,10 @@ a {
     text-decoration: none;
 }
 
-a:active,
-a:visited {
+a:link,
+a:visited,
+a:hover,
+a:active {
     color: black;
 }
 
