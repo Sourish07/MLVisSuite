@@ -64,6 +64,10 @@ function gradDesc(numOfIterations, algoName) {
 }
 
 function addLinRegEquation(coefficients) {
+    if (coefficients.length === 0) {
+        return "0"
+    }
+
     let html = ""
     for (let i = 0; i < coefficients.length; i++) {
         if (coefficients[i] === 0)
@@ -108,6 +112,9 @@ function addLinRegEquation(coefficients) {
 }
 
 function addLogRegEquation(coefficients) {
+    if (coefficients.length === 0) {
+        return "0"
+    }
     let html = ""
     for (let i = 0; i < coefficients.length; i++) {
         if (coefficients[i] === 0)

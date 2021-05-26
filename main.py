@@ -7,7 +7,7 @@ import numpy as np
 app = Flask(__name__)
 
 X, y, w = np.array([]), np.array([]), np.array([])
-df = None
+df = pd.DataFrame(columns=['x', 'y', 'class'], dtype=np.float)
 fig, ax = None, None
 
 line, scatter, gd_line_x = None, None, None
@@ -53,6 +53,7 @@ def favicon():
 def clear_window():
     global X, y, fig, ax, w, line, current_degree, df, centroids
     df = pd.DataFrame(columns=['x', 'y', 'class'], dtype=np.float)
+    X, y, w = np.array([]), np.array([]), np.array([])
     centroids = None
 
     fig, ax = plt.subplots()
@@ -123,7 +124,6 @@ def linreg_gradient_descent():
             line = ax.plot(gd_line_x[:, [1]], gd_line_x @ w, color='k', linewidth=3)
 
     w_list = [round(i.item(), 3) for i in w]
-
     update_converged_text()
 
     return jsonify({'graph': get_html_fig(),
@@ -272,7 +272,9 @@ def redraw_kmeans():
 
 
 def kmeans_return():
-    if is_converged:
+    if len(df) == 0:
+        next_step = "Initialize centroids"
+    elif is_converged:
         next_step = "Centroids haven't moved"
     elif step_find_closest_centroid:
         next_step = "Click to recolor the points based on closest centroid"
@@ -294,13 +296,13 @@ def reinitialize_centroids():
         centroids['class'] = classes[:k]
         centroids.set_index('class', inplace=True)
 
-    step_find_closest_centroid = False
-    is_converged = False
+        step_find_closest_centroid = False
+        is_converged = False
 
-    df['class'] = df.apply(find_closest_centroid, axis=1)
+        df['class'] = df.apply(find_closest_centroid, axis=1)
 
-    redraw_kmeans()
-    update_converged_text()
+        redraw_kmeans()
+        update_converged_text()
     return kmeans_return()
 
 
@@ -316,7 +318,7 @@ def get_html_fig():
 def update_converged_text():
     global info_text
     if len(df) == 0:
-        info_text = "Click to add data"
+        info_text = "Click on the graph to add data points"
     elif k is not None and len(df) < k:
         info_text = "Add more data points than clusters"
     elif is_converged:
