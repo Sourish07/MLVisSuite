@@ -4,7 +4,7 @@ from mpld3 import fig_to_html, plugins
 import pandas as pd
 import numpy as np
 
-application = Flask(__name__)
+app = Flask(__name__)
 
 X, y, w = np.array([]), np.array([]), np.array([])
 df = pd.DataFrame(columns=['x', 'y', 'class'], dtype=np.float)
@@ -39,17 +39,17 @@ k = None
 step_find_closest_centroid = True
 scatter_points = None
 
-@application.route('/')
+@app.route('/')
 def main():
     return render_template("index.html")
 
 
-@application.route('/favicon.ico')
+@app.route('/favicon.ico')
 def favicon():
     return send_from_directory('static', 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
-@application.route('/clear')
+@app.route('/clear')
 def clear_window():
     global X, y, fig, ax, w, line, current_degree, df, centroids
     df = pd.DataFrame(columns=['x', 'y', 'class'], dtype=np.float)
@@ -64,7 +64,7 @@ def clear_window():
     plugins.connect(fig, MoveAxis())
 
 
-@application.route('/add-point', methods=['POST'])
+@app.route('/add-point', methods=['POST'])
 def add_point():
     global is_converged, is_new_point_added, scatter
 
@@ -81,7 +81,7 @@ def add_point():
 
 
 #### LINEAR REGRESSION ####
-@application.route('/linreg')
+@app.route('/linreg')
 def linear_regression():
     global line
     clear_window()
@@ -89,7 +89,7 @@ def linear_regression():
     return render_template("linreg.html", graph=get_html_fig())
 
 
-@application.route('/linreg-grad-desc', methods=['POST'])
+@app.route('/linreg-grad-desc', methods=['POST'])
 def linreg_gradient_descent():
     global current_degree, is_new_point_added, X, y, w, is_converged, line, gd_line_x
     if len(df) != 0:
@@ -133,7 +133,7 @@ def linreg_gradient_descent():
 
 
 #### LOGISTIC REGRESSION ####
-@application.route('/logreg')
+@app.route('/logreg')
 def logistic_regression():
     global contour
     clear_window()
@@ -142,7 +142,7 @@ def logistic_regression():
     return render_template("logreg.html", graph=get_html_fig())
 
 
-@application.route('/logreg-grad-desc', methods=['POST'])
+@app.route('/logreg-grad-desc', methods=['POST'])
 def logreg_gradient_descent():
     global current_degree, is_new_point_added, X, y, w, is_converged, line, gd_line_x, a, b, contour, new_features
     if len(df) != 0:
@@ -194,7 +194,7 @@ def logreg_gradient_descent():
 
 
 #### K-MEANS ####
-@application.route('/kmeans')
+@app.route('/kmeans')
 def k_means():
     global step_find_closest_centroid
     clear_window()
@@ -202,7 +202,7 @@ def k_means():
     return render_template("kmeans.html", graph=get_html_fig())
 
 
-@application.route('/kmeans-iteration', methods=['POST'])
+@app.route('/kmeans-iteration', methods=['POST'])
 def k_means_iteration():
     global centroids, k, is_converged, step_find_closest_centroid, scatter_points, fig, ax
     new_k = int(request.get_json()['num_of_clusters'])
@@ -287,7 +287,7 @@ def kmeans_return():
 
 
 
-@application.route("/kmeans-reinitialize", methods=["POST"])
+@app.route("/kmeans-reinitialize", methods=["POST"])
 def reinitialize_centroids():
     global k, centroids, step_find_closest_centroid, is_converged
     k = int(request.get_json()['num_of_clusters'])
@@ -350,4 +350,4 @@ class MoveAxis(plugins.PluginBase):
 
 
 if __name__ == '__main__':
-    application.run(debug=True)
+    app.run(debug=True)
