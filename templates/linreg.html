@@ -9,7 +9,6 @@
 {% endblock %}
 
 {% block graph %}
-{#    <div id="graph" onclick='addPoint("r")'>#}
     <div id="graph">
         <canvas id="myChart" width="500" height="500"></canvas>
     </div>
@@ -22,7 +21,7 @@
         <button onclick="gradDesc(10, 'linreg-grad-desc')">10 iterations</button>
         <button onclick="gradDesc(100, 'linreg-grad-desc')">100 iterations</button>
         <button onclick="gradDesc(100_000_000, 'linreg-grad-desc')">Until convergence</button>
-        <button onclick="location.reload()">Clear</button>
+        <button onclick="location.reload()">Reset</button>
     </div>
 {% endblock %}
 

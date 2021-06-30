@@ -12,33 +12,6 @@ $(window).on("click", function (e) {
     }
 })
 
-
-// function addPoint(color) {
-//     alert("hello")
-//     if (!color) {
-//         color = $("input[name='class']:checked").val()
-//     }
-//     const point = $(".mpld3-coordinates").text();
-//     let coordinates = point.matchAll("-?\\d+\\.?\\d+");
-//     coordinates = Array.from(coordinates)
-//     if (coordinates.length === 0) {
-//         return
-//     }
-//     const x = parseFloat(coordinates[0][0]);
-//     const y = parseFloat(coordinates[1][0]);
-//
-//     $.ajax({
-//         type: "POST",
-//         url: "add-point",
-//         data: JSON.stringify({"x": x, "y": y, "class": color}),
-//         contentType: "application/json"
-//     }).done(function (data) {
-//         $("#graph").html(data)
-//     }).fail(function (data) {
-//         alert("POST failed");
-//     });
-// }
-
 function gradDesc(numOfIterations, algoName) {
     const numOfDegrees = $("input[name='degree']:checked").val()
     $.ajax({
@@ -68,10 +41,7 @@ function gradDesc(numOfIterations, algoName) {
 
         $("#converged").text(data['converged'])
         $("#cost").text(data['cost'])
-    }).fail(function (data) {
-        //console.log(chart)
-        alert("POST failed");
-    });
+    }).fail(failedPost);
 }
 
 function addLinRegEquation(coefficients) {
@@ -188,9 +158,7 @@ function kMeans(numOfIterations) {
             "num_of_clusters": numOfClusters
         }),
         contentType: "application/json"
-    }).done(updateKMeansInfo).fail(function (data) {
-        alert("POST failed");
-    });
+    }).done(updateKMeansInfo).fail(failedPost);
 }
 
 function reinitializeCentroids() {
@@ -202,9 +170,7 @@ function reinitializeCentroids() {
             "num_of_clusters": numOfClusters
         }),
         contentType: "application/json"
-    }).done(updateKMeansInfo).fail(function (data) {
-        alert("POST failed");
-    });
+    }).done(updateKMeansInfo).fail(failedPost);
 }
 
 function updateKMeansInfo(data) {
@@ -218,9 +184,11 @@ function updateKMeansInfo(data) {
 
     }
     chart.update()
-    // data['data_points']
-    // data['centroids_coords']
 
     $("#converged").text(data['converged'])
     $("#next_step").text(data['next_step'])
+}
+
+function failedPost() {
+    alert("POST failed");
 }
