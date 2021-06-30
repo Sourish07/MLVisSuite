@@ -50,19 +50,19 @@ function gradDesc(numOfIterations, algoName) {
         }),
         contentType: "application/json"
     }).done(function (data) {
+        var indexOfLineDataset;
         if (algoName === "linreg-grad-desc") {
             $("#equation").html(addLinRegEquation(data['coefficients']))
+            indexOfLineDataset = 1;
 
         } else if (algoName === "logreg-grad-desc") {
             $("#equation").html(addLogRegEquation(data['coefficients']))
+            indexOfLineDataset = 2;
         }
-        //$("#graph").html(data['graph'])
 
-        //console.log(chart.data.datasets[1].data)
-        //chart.data.datasets[1].data.pop()
         if (data['line_points'].length) {
-            chart.data.datasets[1].data.length = 0
-            chart.data.datasets[1].data.push(...data['line_points'])
+            chart.data.datasets[indexOfLineDataset].data.length = 0
+            chart.data.datasets[indexOfLineDataset].data.push(...data['line_points'])
             chart.update()
         }
 

@@ -74,11 +74,6 @@ def add_point():
 
     df.loc[len(df)] = [data['x'], data['y'], data['class']]
 
-    print(df.dtypes)
-
-    # if scatter is not None:
-    #     scatter.remove()
-    #scatter = ax.scatter(df['x'], df['y'], color=df['class'], s=10)
     return get_html_fig()
 
 
@@ -153,6 +148,7 @@ def logistic_regression():
 @app.route('/logreg-grad-desc', methods=['POST'])
 def logreg_gradient_descent():
     global current_degree, is_new_point_added, X, y, w, is_converged, line, gd_line_x, a, b, contour, new_features
+    line_points = []
     if len(df) != 0:
         new_degree = int(request.get_json()['degree'])
         # If the degree was changed or if a new point was added, we need to recreate the entire X dataset with the
@@ -191,11 +187,18 @@ def logreg_gradient_descent():
             C = new_features @ w
             contour = ax.contour(a, b, C.squeeze(), 0, colors='k', linewidths=3)
 
+            contour_path = contour.collections[1].get_paths()[0]
+            for _x, _y in contour_path.vertices:
+                line_points.append({
+                    "x": _x,
+                    "y": _y
+                })
+
     w_list = [round(i.item(), 3) for i in w]
 
     update_converged_text()
 
-    return jsonify({'graph': get_html_fig(),
+    return jsonify({'line_points': line_points,
                     'converged': info_text,
                     'cost': round(cost(), 2),
                     'coefficients': w_list})

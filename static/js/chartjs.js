@@ -1,19 +1,81 @@
-var ctx = $('#myChart');
+const ctx = $('#myChart');
+
+let url = $(location).attr('href');
+let algoName = url.split('/').pop();
+
+let datasets;
+if (algoName === "linreg") {
+    datasets = [
+        {
+            type: 'scatter',
+            pointStyle: 'point',
+            data: [],
+            backgroundColor: "#FF0000",
+            radius: 5,
+        },
+        {
+            type: 'line',
+            data: [],
+            radius: 0
+        }
+    ]
+} else if (algoName === "logreg") {
+    datasets = [
+        {
+            type: 'scatter',
+            pointStyle: 'point',
+            data: [],
+            backgroundColor: "#FF0000",
+            radius: 5,
+        },
+        {
+            type: 'scatter',
+            pointStyle: 'point',
+            data: [],
+            backgroundColor: "#0000FF",
+            radius: 5
+        },
+        {
+            type: 'line',
+            data: [],
+            pointRadius: 0
+        }
+    ]
+} else if (algoName === "kmeans") {
+    datasets = [
+        {
+            type: 'scatter',
+            pointStyle: 'point',
+            data: [],
+            backgroundColor: "#FF0000",
+            radius: 5,
+        },
+        {
+            type: 'scatter',
+            pointStyle: 'star',
+            data: [],
+            backgroundColor: "#FF0000",
+            radius: 15,
+            borderWidth: 5
+        },
+        {
+            type: 'scatter',
+            pointStyle: 'point',
+            data: [],
+            backgroundColor: "#0000FF",
+            radius: 5,
+        },
+        {
+            type: 'line',
+            data: [],
+            pointRadius: 0
+        }
+    ]
+}
+
 const chart = new Chart(ctx, {
     data: {
-        datasets: [
-            {
-                type: 'scatter',
-                data: [],
-                pointBackgroundColor: "#FF0000",
-                pointRadius: 5
-            },
-            {
-                type: 'line',
-                data: [],
-                pointRadius: 0
-            }
-        ]
+        datasets: datasets
     },
     options: {
         onClick: (e) => {
@@ -23,36 +85,23 @@ const chart = new Chart(ctx, {
             let dataY = chart.scales.yAxis.getValueForPixel(canvasPosition.y).toFixed(2);
             dataX = parseFloat(dataX)
             dataY = parseFloat(dataY)
-            console.log(dataX, dataY)
-            console.log(typeof dataX)
-            console.log(typeof dataY)
 
             const new_point = {
                 x: dataX,
                 y: dataY
             }
 
-            const ajax_data = new_point;
-            ajax_data["class"] = 'r'
+            switch (algoName) {
+                case "linreg":
+                    linearRegression(new_point)
+                    break;
+                case "logreg":
+                    logisticRegression(new_point)
+                    break;
+            }
 
-            $.ajax({
-                type: "POST",
-                url: "add-point",
-                data: JSON.stringify(ajax_data),
-                contentType: "application/json"
-            }).done(function (data) {
-                //$("#graph").html(data)
-            }).fail(function (data) {
-                alert("POST failed");
-            });
-
-            chart.data.datasets[0].data.push(new_point)
 
             chart.update();
-        },
-        title: {
-            display: true,
-            text: "Linear Regression"
         },
         scales: {
             xAxis: {
@@ -74,6 +123,48 @@ const chart = new Chart(ctx, {
                 enabled: false
             },
         },
+        layout: {
+            padding: 20
+        },
+        events: ['click'],
         animation: false
     }
 });
+
+function linearRegression(new_point) {
+    const ajax_data = new_point;
+    ajax_data["class"] = 'r'
+
+    $.ajax({
+        type: "POST",
+        url: "add-point",
+        data: JSON.stringify(ajax_data),
+        contentType: "application/json"
+    }).done(function (data) {
+    }).fail(function (data) {
+        alert("POST failed");
+    });
+
+    chart.data.datasets[0].data.push(new_point)
+}
+
+function logisticRegression(new_point) {
+    const ajax_data = new_point;
+    ajax_data["class"] = $("input[name='class']:checked").val();
+
+    $.ajax({
+        type: "POST",
+        url: "add-point",
+        data: JSON.stringify(ajax_data),
+        contentType: "application/json"
+    }).done(function (data) {
+    }).fail(function (data) {
+        alert("POST failed");
+    });
+
+    if (ajax_data['class'] === 'r') {
+        chart.data.datasets[0].data.push(new_point)
+    } else if (ajax_data['class'] === 'b') {
+        chart.data.datasets[1].data.push(new_point)
+    }
+}
