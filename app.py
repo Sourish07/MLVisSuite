@@ -51,17 +51,17 @@ def favicon():
 
 @app.route('/clear')
 def clear_window():
-    global X, y, fig, ax, w, line, current_degree, df, centroids
+    global X, y, w, line, current_degree, df, centroids
     df = pd.DataFrame(columns=['x', 'y', 'class'], dtype=np.float)
     X, y, w = np.array([]), np.array([]), np.array([])
     centroids = None
 
-    fig, ax = plt.subplots()
-    ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
+    #fig, ax = plt.subplots()
+    #ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
 
-    mpld3.plugins.clear(fig)
-    plugins.connect(fig, plugins.MousePosition(fontsize=0))
-    plugins.connect(fig, MoveAxis())
+    #mpld3.plugins.clear(fig)
+    #plugins.connect(fig, plugins.MousePosition(fontsize=0))
+    #plugins.connect(fig, MoveAxis())
 
 
 @app.route('/add-point', methods=['POST'])
@@ -74,7 +74,8 @@ def add_point():
 
     df.loc[len(df)] = [data['x'], data['y'], data['class']]
 
-    return get_html_fig()
+    #return get_html_fig()
+    return jsonify({'status': 'success'})
 
 
 #### LINEAR REGRESSION ####
@@ -82,8 +83,9 @@ def add_point():
 def linear_regression():
     global line
     clear_window()
-    line = ax.plot(og_line_x_vals, np.zeros_like(og_line_x_vals), color='k', linewidth=3)
-    return render_template("linreg.html", graph=get_html_fig())
+    #line = ax.plot(og_line_x_vals, np.zeros_like(og_line_x_vals), color='k', linewidth=3)
+#    return render_template("linreg.html", graph=get_html_fig())
+    return render_template("linreg.html")
 
 
 @app.route('/linreg-grad-desc', methods=['POST'])
@@ -140,9 +142,10 @@ def linreg_gradient_descent():
 def logistic_regression():
     global contour
     clear_window()
-    C = np.stack([a, b], axis=2) @ np.array([[0], [1]])
-    contour = ax.contour(a, b, C.squeeze(), 0, colors='k', linewidths=3)
-    return render_template("logreg.html", graph=get_html_fig())
+    # C = np.stack([a, b], axis=2) @ np.array([[0], [1]])
+    # contour = ax.contour(a, b, C.squeeze(), 0, colors='k', linewidths=3)
+#    return render_template("logreg.html", graph=get_html_fig())
+    return render_template("logreg.html")
 
 
 @app.route('/logreg-grad-desc', methods=['POST'])
@@ -162,7 +165,7 @@ def logreg_gradient_descent():
 
             X = np.hstack(x_vals)
             new_features = np.stack(ab, axis=2)
-            y = df[['class']].replace(["r", "b"], [-1, 1]).to_numpy()
+            y = df[['class']].replace([0, 1], [-1, 1]).to_numpy()
             w = np.zeros((new_degree * 2 + 1, 1))
 
             current_degree = new_degree
@@ -180,12 +183,9 @@ def logreg_gradient_descent():
                     is_converged = True
                 w = z
 
-            if contour is not None:
-                for coll in contour.collections:
-                    coll.remove()
-
             C = new_features @ w
-            contour = ax.contour(a, b, C.squeeze(), 0, colors='k', linewidths=3)
+            axes = plt.subplot()
+            contour = axes.contour(a, b, C.squeeze(), 0, colors='k', linewidths=3)
 
             contour_path = contour.collections[1].get_paths()[0]
             for _x, _y in contour_path.vertices:

@@ -150,8 +150,9 @@ function linearRegression(new_point) {
 
 function logisticRegression(new_point) {
     const ajax_data = new_point;
-    ajax_data["class"] = $("input[name='class']:checked").val();
-
+    ajax_data["class"] = parseInt($("input[name='class']:checked").val());
+    //ajax_data["class"] = $("input[name='class']:checked").val();
+    console.log(ajax_data['class'])
     $.ajax({
         type: "POST",
         url: "add-point",
@@ -162,9 +163,11 @@ function logisticRegression(new_point) {
         alert("POST failed");
     });
 
-    if (ajax_data['class'] === 'r') {
-        chart.data.datasets[0].data.push(new_point)
-    } else if (ajax_data['class'] === 'b') {
-        chart.data.datasets[1].data.push(new_point)
-    }
+    chart.data.datasets[ajax_data["class"]].data.push(new_point)
+
+    // if (ajax_data['class'] === 0) {
+    //     chart.data.datasets[0].data.push(new_point)
+    // } else if (ajax_data['class'] === 1) {
+    //     chart.data.datasets[1].data.push(new_point)
+    // }
 }
