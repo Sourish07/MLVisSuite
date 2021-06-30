@@ -74,9 +74,11 @@ def add_point():
 
     df.loc[len(df)] = [data['x'], data['y'], data['class']]
 
-    if scatter is not None:
-        scatter.remove()
-    scatter = ax.scatter(df['x'], df['y'], color=df['class'], s=10)
+    print(df.dtypes)
+
+    # if scatter is not None:
+    #     scatter.remove()
+    #scatter = ax.scatter(df['x'], df['y'], color=df['class'], s=10)
     return get_html_fig()
 
 
@@ -92,6 +94,7 @@ def linear_regression():
 @app.route('/linreg-grad-desc', methods=['POST'])
 def linreg_gradient_descent():
     global current_degree, is_new_point_added, X, y, w, is_converged, line, gd_line_x
+    line_points = []
     if len(df) != 0:
         new_degree = int(request.get_json()['degree'])
         if new_degree != current_degree or is_new_point_added:
@@ -120,13 +123,18 @@ def linreg_gradient_descent():
                     is_converged = True
                 w = z
 
-            line.pop().remove()
-            line = ax.plot(gd_line_x[:, [1]], gd_line_x @ w, color='k', linewidth=3)
+            line_x_coords = gd_line_x[:, [1]]
+            line_y_coords = gd_line_x @ w
+            for _x, _y in zip(line_x_coords, line_y_coords):
+                line_points.append({
+                    "x": _x.item(),
+                    "y": _y.item()
+                })
 
     w_list = [round(i.item(), 3) for i in w]
     update_converged_text()
 
-    return jsonify({'graph': get_html_fig(),
+    return jsonify({'line_points': line_points,
                     'converged': info_text,
                     'cost': round(cost(), 2),
                     'coefficients': w_list})

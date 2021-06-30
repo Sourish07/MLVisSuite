@@ -13,30 +13,31 @@ $(window).on("click", function (e) {
 })
 
 
-function addPoint(color) {
-    if (!color) {
-        color = $("input[name='class']:checked").val()
-    }
-    const point = $(".mpld3-coordinates").text();
-    let coordinates = point.matchAll("-?\\d+\\.?\\d+");
-    coordinates = Array.from(coordinates)
-    if (coordinates.length === 0) {
-        return
-    }
-    const x = parseFloat(coordinates[0][0]);
-    const y = parseFloat(coordinates[1][0]);
-
-    $.ajax({
-        type: "POST",
-        url: "add-point",
-        data: JSON.stringify({"x": x, "y": y, "class": color}),
-        contentType: "application/json"
-    }).done(function (data) {
-        $("#graph").html(data)
-    }).fail(function (data) {
-        alert("POST failed");
-    });
-}
+// function addPoint(color) {
+//     alert("hello")
+//     if (!color) {
+//         color = $("input[name='class']:checked").val()
+//     }
+//     const point = $(".mpld3-coordinates").text();
+//     let coordinates = point.matchAll("-?\\d+\\.?\\d+");
+//     coordinates = Array.from(coordinates)
+//     if (coordinates.length === 0) {
+//         return
+//     }
+//     const x = parseFloat(coordinates[0][0]);
+//     const y = parseFloat(coordinates[1][0]);
+//
+//     $.ajax({
+//         type: "POST",
+//         url: "add-point",
+//         data: JSON.stringify({"x": x, "y": y, "class": color}),
+//         contentType: "application/json"
+//     }).done(function (data) {
+//         $("#graph").html(data)
+//     }).fail(function (data) {
+//         alert("POST failed");
+//     });
+// }
 
 function gradDesc(numOfIterations, algoName) {
     const numOfDegrees = $("input[name='degree']:checked").val()
@@ -55,10 +56,20 @@ function gradDesc(numOfIterations, algoName) {
         } else if (algoName === "logreg-grad-desc") {
             $("#equation").html(addLogRegEquation(data['coefficients']))
         }
-        $("#graph").html(data['graph'])
+        //$("#graph").html(data['graph'])
+
+        //console.log(chart.data.datasets[1].data)
+        //chart.data.datasets[1].data.pop()
+        if (data['line_points'].length) {
+            chart.data.datasets[1].data.length = 0
+            chart.data.datasets[1].data.push(...data['line_points'])
+            chart.update()
+        }
+
         $("#converged").text(data['converged'])
         $("#cost").text(data['cost'])
     }).fail(function (data) {
+        //console.log(chart)
         alert("POST failed");
     });
 }
