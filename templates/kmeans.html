@@ -9,8 +9,11 @@
 {% endblock %}
 
 {% block graph %}
-    <div id="graph" onclick='addPoint("k")'>
-        {{ graph | safe }}
+    {#    <div id="graph" onclick='addPoint("k")'>#}
+    {#        {{ graph | safe }}#}
+    {#    </div>#}
+    <div id="graph">
+        <canvas id="myChart" width="500" height="500"></canvas>
     </div>
 {% endblock %}
 

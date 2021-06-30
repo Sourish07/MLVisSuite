@@ -208,7 +208,19 @@ function reinitializeCentroids() {
 }
 
 function updateKMeansInfo(data) {
-    $("#graph").html(data['graph'])
+    chart.data.datasets[0].data.length = 0
+    for (let i = 0; i < 5; i++) {
+        chart.data.datasets[i * 2 + 1].data.length = 0
+        chart.data.datasets[i * 2 + 2].data.length = 0
+
+        chart.data.datasets[i * 2 + 1].data.push(...data['data_points'][i])
+        chart.data.datasets[i * 2 + 2].data.push(data['centroids_coords'][i])
+
+    }
+    chart.update()
+    // data['data_points']
+    // data['centroids_coords']
+
     $("#converged").text(data['converged'])
     $("#next_step").text(data['next_step'])
 }

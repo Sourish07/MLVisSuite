@@ -1,16 +1,15 @@
 from flask import Flask, request, jsonify, render_template, send_from_directory
-import matplotlib.pyplot as plt, mpld3
-from mpld3 import fig_to_html, plugins
+import matplotlib.pyplot as plt
+#from mpld3 import fig_to_html, plugins
 import pandas as pd
 import numpy as np
 
 app = Flask(__name__)
 
+# X holds all of the features, including the higher dimensions ones (i.e. the squared ones)
 X, y, w = np.array([]), np.array([]), np.array([])
 df = pd.DataFrame(columns=['x', 'y', 'class'], dtype=np.float)
-fig, ax = None, None
 
-line, scatter, gd_line_x = None, None, None
 current_degree = None
 
 is_converged = False
@@ -23,7 +22,10 @@ max_axis_val = 10
 x_min, x_max = -max_axis_val, max_axis_val
 y_min, y_max = x_min, x_max
 
+# This variable holds 1000 values between -10 and 10 to draw the line on the linear regression graph
 og_line_x_vals = np.linspace(x_min, x_max + 1, 1000).reshape(-1, 1)
+# This variable holds the X features including any higher dimension ones for the og_line_x_vals
+gd_line_x = None
 
 # logistic regression variables
 _range = x_max - x_min
@@ -31,9 +33,8 @@ a, b = np.meshgrid(np.linspace(-_range / 2, _range / 2, 100), np.linspace(-_rang
 contour = None
 new_features = None
 
-
 # k means variables
-classes = ["r", "b", "g", "c", "m"]
+classes = [0, 1, 2, 3, 4]
 centroids = None
 k = None
 step_find_closest_centroid = True
@@ -81,7 +82,6 @@ def add_point():
 #### LINEAR REGRESSION ####
 @app.route('/linreg')
 def linear_regression():
-    global line
     clear_window()
     #line = ax.plot(og_line_x_vals, np.zeros_like(og_line_x_vals), color='k', linewidth=3)
 #    return render_template("linreg.html", graph=get_html_fig())
@@ -184,8 +184,8 @@ def logreg_gradient_descent():
                 w = z
 
             C = new_features @ w
-            axes = plt.subplot()
-            contour = axes.contour(a, b, C.squeeze(), 0, colors='k', linewidths=3)
+            ax = plt.subplot()
+            contour = ax.contour(a, b, C.squeeze(), 0, colors='k', linewidths=3)
 
             contour_path = contour.collections[1].get_paths()[0]
             for _x, _y in contour_path.vertices:
@@ -210,7 +210,7 @@ def k_means():
     global step_find_closest_centroid
     clear_window()
     step_find_closest_centroid = True
-    return render_template("kmeans.html", graph=get_html_fig())
+    return render_template("kmeans.html") #, graph=get_html_fig()
 
 
 @app.route('/kmeans-iteration', methods=['POST'])
@@ -242,7 +242,7 @@ def k_means_iteration():
                     centroids['x'], centroids['y'] = new_centroids['x'].to_list(), new_centroids['y'].to_list()
                 step_find_closest_centroid = not step_find_closest_centroid
 
-            redraw_kmeans()
+            #redraw_kmeans()
 
     update_converged_text()
 
@@ -292,7 +292,22 @@ def kmeans_return():
     else:
         next_step = "Click to move the centroids to the average of the points in their clusters"
 
-    return jsonify({'graph': get_html_fig(),
+    data_points = {0: [], 1: [], 2: [], 3: [], 4: []}
+    centroids_coords = {0: {}, 1: {}, 2: {}, 3: {}, 4: {}}
+    for i, row in df.iterrows():
+        data_points[row['class']].append({
+            "x": row['x'],
+            "y": row['y']
+        })
+    for i, row in centroids.iterrows():
+        centroids_coords[i] = {
+            "x": row['x'],
+            "y": row['y']
+        }
+    print(df)
+    print(centroids)
+    return jsonify({'data_points': data_points,
+                    'centroids_coords': centroids_coords,
                     'converged': info_text,
                     'next_step': next_step})
 
@@ -312,7 +327,7 @@ def reinitialize_centroids():
 
         df['class'] = df.apply(find_closest_centroid, axis=1)
 
-        redraw_kmeans()
+        #redraw_kmeans()
         update_converged_text()
     return kmeans_return()
 
@@ -322,8 +337,8 @@ def cost():
     return np.sum((X @ w - y) ** 2)
 
 
-def get_html_fig():
-    return fig_to_html(fig, figid="figure")
+# def get_html_fig():
+#     return fig_to_html(fig, figid="figure")
 
 
 def update_converged_text():
@@ -338,26 +353,26 @@ def update_converged_text():
         info_text = "Algorithm has not converged"
 
 
-class MoveAxis(plugins.PluginBase):
-    JAVASCRIPT = """
-        mpld3.register_plugin("moveaxis", MoveAxis);
-        MoveAxis.prototype = Object.create(mpld3.Plugin.prototype);
-        MoveAxis.prototype.constructor = MoveAxis;
-        function MoveAxis(fig, props){
-            mpld3.Plugin.call(this, fig, props);
-        };
-
-        MoveAxis.prototype.draw = function(){
-            document.getElementsByClassName('mpld3-xaxis')[0].setAttribute('transform', 'translate(0,184.8)')
-            document.getElementsByClassName('mpld3-yaxis')[0].setAttribute('transform', 'translate(248,0)')
-            $("g[transform='translate(248.5,0)']").text("")
-            $("g[transform='translate(0,185.3)']").text("")
-            $("tspan[dy='11.015625']").attr('dy', "13.015625")
-        }
-        """
-
-    def __init__(self):
-        self.dict_ = {"type": "moveaxis"}
+# class MoveAxis(plugins.PluginBase):
+#     JAVASCRIPT = """
+#         mpld3.register_plugin("moveaxis", MoveAxis);
+#         MoveAxis.prototype = Object.create(mpld3.Plugin.prototype);
+#         MoveAxis.prototype.constructor = MoveAxis;
+#         function MoveAxis(fig, props){
+#             mpld3.Plugin.call(this, fig, props);
+#         };
+#
+#         MoveAxis.prototype.draw = function(){
+#             document.getElementsByClassName('mpld3-xaxis')[0].setAttribute('transform', 'translate(0,184.8)')
+#             document.getElementsByClassName('mpld3-yaxis')[0].setAttribute('transform', 'translate(248,0)')
+#             $("g[transform='translate(248.5,0)']").text("")
+#             $("g[transform='translate(0,185.3)']").text("")
+#             $("tspan[dy='11.015625']").attr('dy', "13.015625")
+#         }
+#         """
+#
+#     def __init__(self):
+#         self.dict_ = {"type": "moveaxis"}
 
 
 if __name__ == '__main__':
