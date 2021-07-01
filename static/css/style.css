@@ -12,6 +12,14 @@ body {
     align-items: center;
 }
 
+.card h2 {
+    margin: 0;
+}
+
+.card p {
+    padding: 0 10px;
+}
+
 .menu-links {
     position: absolute;
     top: 0;
@@ -119,7 +127,7 @@ p {
     padding: 30px;
 }
 
-h2 {
+.modal-title {
     margin: 0 0 20px 0;
 }
 
