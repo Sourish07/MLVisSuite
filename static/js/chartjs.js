@@ -19,6 +19,7 @@ function createLineDataset() {
     return {
         type: 'line',
         data: [],
+        borderColor: "rgba(0, 0, 0, 0.4)",
         radius: 0
     }
 }
@@ -92,15 +93,24 @@ const chart = new Chart(ctx, {
                 y: dataY
             }
 
-            // switch (algoName) {
-            //     case "linreg":
-            //         linearRegression(new_point)
-            //         break;
-            //     case "logreg":
-            //         logisticRegression(new_point)
-            //         break;
-            // }
-            addPoint(new_point)
+            const ajax_data = new_point;
+
+            if (algoName === 'logreg') {
+                ajax_data["class"] = parseInt($("input[name='class']:checked").val());
+            } else {
+                ajax_data["class"] = 0
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "add-point",
+                data: JSON.stringify(ajax_data),
+                contentType: "application/json"
+            }).fail(function () {
+                alert("POST failed");
+            });
+
+            chart.data.datasets[ajax_data["class"]].data.push(new_point)
 
 
             chart.update();
@@ -132,41 +142,3 @@ const chart = new Chart(ctx, {
         animation: false
     }
 });
-
-function addPoint(new_point) {
-    const ajax_data = new_point;
-
-    if (algoName === 'logreg') {
-        ajax_data["class"] = parseInt($("input[name='class']:checked").val());
-    } else {
-        ajax_data["class"] = 0
-    }
-
-    $.ajax({
-        type: "POST",
-        url: "add-point",
-        data: JSON.stringify(ajax_data),
-        contentType: "application/json"
-    }).fail(function () {
-        alert("POST failed");
-    });
-
-    chart.data.datasets[ajax_data["class"]].data.push(new_point)
-}
-
-// function logisticRegression(new_point) {
-//     const ajax_data = new_point;
-//     ajax_data["class"] = parseInt($("input[name='class']:checked").val());
-//     console.log(ajax_data['class'])
-//     $.ajax({
-//         type: "POST",
-//         url: "add-point",
-//         data: JSON.stringify(ajax_data),
-//         contentType: "application/json"
-//     }).done(function (data) {
-//     }).fail(function (data) {
-//         alert("POST failed");
-//     });
-//
-//     chart.data.datasets[ajax_data["class"]].data.push(new_point)
-// }
