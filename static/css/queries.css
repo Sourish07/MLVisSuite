@@ -36,7 +36,8 @@
     }
 
     .centerpiece {
-        width: 50vw;
+        width: 75vw;
+        max-width: 300px;
         margin: 0 auto;
     }
 
