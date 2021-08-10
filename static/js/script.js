@@ -12,6 +12,29 @@ $(window).on("click", function (e) {
     }
 })
 
+///////////////////////////////////////////
+const nav = $(".mobile-sidebar-nav");
+
+$(".hamburger-icon").on("click", function (e) {
+    nav.css("width", "300px");
+});
+
+nav.on("click", function (e) {
+    e.stopPropagation();
+})
+
+$(document).on("click", function (e) {
+
+    if (nav.css("width") !== "0px") {
+        nav.css("width", 0);
+    }
+});
+
+$(".close-sidebar-nav").on("click", function () {
+    nav.css("width", 0);
+})
+///////////////////////////////////////////
+
 function gradDesc(numOfIterations, algoName) {
     const numOfDegrees = $("input[name='degree']:checked").val()
     $.ajax({

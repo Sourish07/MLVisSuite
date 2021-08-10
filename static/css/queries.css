@@ -1,5 +1,59 @@
 @media only screen and (max-width: 1024px) {
+    .menu-links-other-algos {
+        display: inline;
+    }
+
+    .algoLinks {
+        display: none;
+    }
+
+    .centerpiece {
+        width: 500px;
+        margin: 0 0 0 5px;
+    }
+
     #info {
-        width: auto;
+        position: initial;
+        margin-top: 100px;
+    }
+}
+
+@media only screen and (max-width: 750px) {
+    h1 {
+        margin: 5px 60px 0 60px;
+    }
+
+    .menu-links {
+        display: none;
+    }
+
+    .hamburger-icon {
+        display: block;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 25px;
+    }
+
+    .centerpiece {
+        width: 50vw;
+        margin: 0 auto;
+    }
+
+    .row {
+        flex-direction: column;
+    }
+
+    #info {
+        /*top: initial;*/
+        bottom: 0;
+        right: initial;
+        margin: 10px auto;
+        /*margin-top: initial;*/
+        /*position: initial;*/
+    }
+
+    #info br {
+        display: none;
     }
 }

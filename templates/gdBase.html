@@ -1,33 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div style="display: flex; flex-direction: column">
-    <p style="text-align: center">Perform Gradient Descent</p>
-    {% block gdButtons %}{% endblock %}
-</div>
-
-<div id='info'>
-    <p id='converged'>Click on the graph to add data points</p>
-    <br/>
-
-    <p>Degree of line: </p>
-    <div>
-        <input type="radio" id="linear" name="degree" value="1" checked>
-        <label for="male">Linear</label>
+    <div style="display: flex; flex-direction: column">
+        <p style="text-align: center">Perform Gradient Descent</p>
+        {% block gdButtons %}{% endblock %}
     </div>
-    <div>
-        <input type="radio" id="quadratic" name="degree" value="2">
-        <label for="female">Quadratic</label>
+{% endblock %}
+
+{% block info %}
+    <div id='info'>
+        <p id='converged'>Click on the graph to add data points</p>
+        <br/>
+
+        <p>Degree of line: </p>
+        <div>
+            <input type="radio" id="linear" name="degree" value="1" checked>
+            <label for="male">Linear</label>
+        </div>
+        <div>
+            <input type="radio" id="quadratic" name="degree" value="2">
+            <label for="female">Quadratic</label>
+        </div>
+        <br/>
+
+        {% block chooseClass %}{% endblock %}
+
+        <p>Cost:</p>
+        <span id='cost'>0</span>
+        <br/>
+
+        <p>Equation:</p>
+        <span id="equation">0</span>
     </div>
-    <br/>
-
-    {% block chooseClass %}{% endblock %}
-
-    <p>Cost:</p>
-    <span id='cost'>0</span>
-    <br/>
-
-    <p>Equation:</p>
-    <span id="equation">0</span>
-</div>
 {% endblock %}

@@ -23,7 +23,17 @@
     <a href="/">Home</a>
     <a href="https://www.sourish.dev">About the Creator</a>
 </div>
-
+<img class="hamburger-icon" src="static/images/hamburger-menu.svg" alt="hamburger">
+<div class="mobile-sidebar-nav">
+    <a class="close-sidebar-nav">&times;</a>
+    <a href="/">Home</a>
+    <a href="https://www.sourish.dev">About the Creator</a>
+    <hr style="color: white; width: 95%">
+    <p style="font-size: 2rem; margin-left: 5px; font-weight: bold">Other Algorithms</p>
+    <a href="/linreg">Linear Regression</a>
+    <a href="/logreg">Logistic Regression</a>
+    <a href="/kmeans">K-Means</a>
+</div>
 <div class="algoLinks">
     <span>Other Algorithms</span>
     <a href="/linreg">Linear Regression</a>
@@ -31,11 +41,15 @@
     <a href="/kmeans">K-Means</a>
 </div>
 
-{% block graph %}{% endblock %}
+<div class="row">
+    <div class="centerpiece">
+        {% block graph %}{% endblock %}
 
-{% block content %}{% endblock %}
-
-<button id="more-info">{% block modalButtonText %}{% endblock %}</button>
+        {% block content %}{% endblock %}
+        <button id="more-info">{% block modalButtonText %}{% endblock %}</button>
+    </div>
+    {% block info %}{% endblock %}
+</div>
 
 <div id="info-modal">
     <div id="info-modal-content">
