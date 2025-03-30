@@ -52,7 +52,7 @@ def favicon():
 @app.route('/clear')
 def clear_window():
     global X, y, w, line, current_degree, df, centroids
-    df = pd.DataFrame(columns=['x', 'y', 'class'], dtype=np.float)
+    df = pd.DataFrame(columns=['x', 'y', 'class'], dtype=np.float64)
     X, y, w = np.array([]), np.array([]), np.array([])
     centroids = None
 
