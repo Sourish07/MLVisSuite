@@ -128,11 +128,3 @@ This document outlines the requirements for the "ML Visualization Suite," a web 
 *   Designed for single-user sessions. State is not shared or persisted.
 *   Focuses on visualization of the *results* and *key steps*, not necessarily a real-time, frame-by-frame animation of every single gradient update (though step-by-step execution is supported).
 *   Dataset size and computational complexity are assumed to be within reasonable limits for interactive educational purposes.
-
-### 10. Future Considerations (Optional)
-
-*   User accounts and saving/loading configurations.
-*   Support for more algorithms (e.g., SVM, Neural Networks).
-*   Support for uploading user datasets (CSV).
-*   More advanced parameter tuning options.
-*   Deployment strategy (e.g., Docker, Vercel, Cloud Platform).
