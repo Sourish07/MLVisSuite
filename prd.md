@@ -14,7 +14,7 @@ This document outlines the requirements for the "ML Visualization Suite," a web 
 *   Visually demonstrate the iterative process and outcome of K-Means Clustering on user-provided 2D data.
 *   Allow users to interactively add/remove data points and control relevant algorithm parameters (e.g., polynomial degree, learning rate, number of iterations, number of clusters).
 *   Deliver clear visual and textual feedback on the algorithm's state, progress, and results (e.g., convergence status, cost/loss values, calculated parameters).
-*   Build the application using a modern, maintainable, and scalable tech stack (Next.js frontend, FastAPI backend).
+*   Build the application using a modern, maintainable, and scalable tech stack (React frontend, FastAPI backend).
 
 ### 3. Target Audience
 
@@ -26,7 +26,7 @@ This document outlines the requirements for the "ML Visualization Suite," a web 
 
 **4.1. Core Architecture:**
 
-*   **Frontend:** Next.js (React framework) for building the user interface.
+*   **Frontend:** React for building the user interface.
 *   **Backend:** FastAPI (Python framework) for serving API endpoints and performing ML computations.
 *   **Communication:** Frontend communicates with the backend via asynchronous RESTful API calls (JSON).
 
@@ -37,14 +37,14 @@ This document outlines the requirements for the "ML Visualization Suite," a web 
 
 **4.3. Common Interactive Plot Component:**
 
-*   A reusable React component displaying a 2D plot (using a library like Plotly.js, Chart.js, or D3.js).
+*   A reusable React component displaying a 2D plot (using a library like Chart.js, Plotly.js, or D3.js).
 *   Functionality to add data points by clicking on the plot. Class/label selection UI integrated where applicable (e.g., Logistic Regression).
 *   Functionality to clear all data points from the plot and reset the associated algorithm state.
 *   Visual rendering of algorithm results (lines, boundaries, cluster assignments, centroids) updated dynamically.
 
 **4.4. Linear Regression Module:**
 
-*   **UI:** Dedicated page/view within the Next.js application.
+*   **UI:** Dedicated view/component within the React application.
 *   **Controls:** Inputs for polynomial degree, learning rate (optional, potentially auto-tuned), number of iterations/steps. Button to trigger Gradient Descent.
 *   **Backend Endpoint (`/api/linreg/compute`):**
     *   Accepts current data points, degree, and iteration parameters via POST request (using Pydantic models for validation).
@@ -55,7 +55,7 @@ This document outlines the requirements for the "ML Visualization Suite," a web 
 
 **4.5. Logistic Regression Module:**
 
-*   **UI:** Dedicated page/view. UI for selecting class labels when adding points.
+*   **UI:** Dedicated view/component. UI for selecting class labels when adding points.
 *   **Controls:** Inputs for polynomial degree, learning rate (optional), number of iterations/steps. Button to trigger Gradient Descent.
 *   **Backend Endpoint (`/api/logreg/compute`):**
     *   Accepts current data points (with labels), degree, and iteration parameters via POST request (Pydantic validation).
@@ -67,7 +67,7 @@ This document outlines the requirements for the "ML Visualization Suite," a web 
 
 **4.6. K-Means Clustering Module:**
 
-*   **UI:** Dedicated page/view.
+*   **UI:** Dedicated view/component.
 *   **Controls:** Input for the number of clusters (`k`). Buttons for:
     *   Initialize/Reinitialize Centroids (randomly).
     *   Run Assignment Step.
@@ -83,20 +83,21 @@ This document outlines the requirements for the "ML Visualization Suite," a web 
 
 ### 5. User Interface (UI) & User Experience (UX)
 
-*   **Framework:** Next.js with React.
+*   **Framework:** React.
 *   **Styling:** Utilize a modern CSS framework (e.g., Tailwind CSS) or UI component library (e.g., Material UI, Chakra UI, Shadcn/ui) for a clean, consistent, and responsive design.
 *   **Component-Based:** Structure the UI using reusable React components (Plot, Control Panel, Status Display, etc.).
-*   **State Management:** Leverage React state management (e.g., `useState`, `useReducer`, Context API, or a library like Zustand/Redux Toolkit) within the Next.js frontend to manage UI state, user inputs, and data fetched from the backend.
+*   **State Management:** Leverage React state management (e.g., `useState`, `useReducer`, Context API, or a library like Zustand/Redux Toolkit) to manage UI state, user inputs, and data fetched from the backend.
+*   **Routing:** Use React Router for client-side routing between different visualization modules.
 *   **Feedback:** Provide clear visual feedback during computations (e.g., loading indicators) and display results (cost, coefficients, convergence status) prominently.
 *   **Responsiveness:** Ensure the layout adapts gracefully to different screen sizes (desktop, tablet, mobile).
 
 ### 6. Data Model & Management
 
-*   **Frontend State:** The primary source of truth for current data points and UI control settings will reside in the Next.js application's state.
+*   **Frontend State:** The primary source of truth for current data points and UI control settings will reside in the React application's state.
 *   **Backend:** FastAPI endpoints will be stateless. They receive data from the frontend, perform computations, and return results without persisting state between requests.
     *   Data validation using Pydantic models for all API inputs.
 *   **Data Flow:**
-    1.  User interacts with the Next.js UI (adds points, changes parameters, clicks buttons).
+    1.  User interacts with the React UI (adds points, changes parameters, clicks buttons).
     2.  Frontend state is updated.
     3.  Frontend sends relevant data (points, parameters) via API call to the FastAPI backend.
     4.  FastAPI endpoint validates input, performs ML calculation (using libraries like NumPy, Scikit-learn).
@@ -108,17 +109,18 @@ This document outlines the requirements for the "ML Visualization Suite," a web 
 
 *   **Performance:** Frontend should be responsive. Backend computations should be reasonably fast for typical educational dataset sizes (e.g., < 500 points). FastAPI's asynchronous capabilities can improve I/O handling if external resources were involved, but core ML computations remain CPU-bound.
 *   **Scalability:** The stateless nature of the FastAPI backend makes it horizontally scalable (multiple instances can run behind a load balancer). Frontend scaling handled by standard web serving/CDN practices. Overall scalability limited by the single-user-session nature of the interaction model (no shared state).
-*   **Maintainability:** Clean separation between frontend (Next.js) and backend (FastAPI). Use of typed languages/features (TypeScript in Next.js, Python type hints with Pydantic in FastAPI) improves code quality and maintainability.
+*   **Maintainability:** Clean separation between frontend (React) and backend (FastAPI). Use of typed languages/features (TypeScript in React, Python type hints with Pydantic in FastAPI) improves code quality and maintainability.
 *   **Security:** Basic input validation via Pydantic on the backend. Standard web security practices (e.g., HTTPS) should be applied during deployment. No authentication/authorization required for this version.
 *   **Error Handling:** Graceful error handling on both frontend (e.g., displaying messages for failed API calls) and backend (returning appropriate HTTP error codes and messages).
 *   **Testing:** Unit and integration tests are recommended for both backend API endpoints (e.g., using `pytest`) and frontend components (e.g., using Jest/React Testing Library).
 
 ### 8. Technology Stack Summary
 
-*   **Frontend:** Next.js (React, TypeScript recommended)
+*   **Frontend:** React (TypeScript recommended)
 *   **Backend:** FastAPI (Python 3.x)
 *   **ML Libraries:** NumPy, Scikit-learn (optional, but recommended for robust implementations)
-*   **Plotting:** A JavaScript library compatible with React (e.g., Plotly.js, Chart.js, Recharts, D3.js)
+*   **Plotting:** A JavaScript library compatible with React (e.g., Chart.js, Plotly.js, Recharts, D3.js)
+*   **Routing:** React Router for client-side navigation
 *   **Styling:** CSS Framework (e.g., Tailwind CSS) or Component Library (e.g., MUI, Chakra UI)
 *   **Package Management:** `npm`/`yarn` (Frontend), `pip`/`poetry`/`uv` (Backend)
 *   **API Specification:** OpenAPI (automatically generated by FastAPI)
@@ -128,11 +130,3 @@ This document outlines the requirements for the "ML Visualization Suite," a web 
 *   Designed for single-user sessions. State is not shared or persisted.
 *   Focuses on visualization of the *results* and *key steps*, not necessarily a real-time, frame-by-frame animation of every single gradient update (though step-by-step execution is supported).
 *   Dataset size and computational complexity are assumed to be within reasonable limits for interactive educational purposes.
-
-### 10. Future Considerations (Optional)
-
-*   User accounts and saving/loading configurations.
-*   Support for more algorithms (e.g., SVM, Neural Networks).
-*   Support for uploading user datasets (CSV).
-*   More advanced parameter tuning options.
-*   Deployment strategy (e.g., Docker, Vercel, Cloud Platform).
